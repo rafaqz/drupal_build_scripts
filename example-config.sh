@@ -18,7 +18,7 @@ THEME='' # Changing the theme name may break the block layout.
 MAKE_FILE=''
 
 # List extra feature modules to enable, separated by spaces or commas.
-ENABLE_FEATURES=''
+ENABLE_MODULES=''
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'

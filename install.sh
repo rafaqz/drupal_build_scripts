@@ -43,7 +43,7 @@ if cd $BASE_DIR; then
     sudo chown -R $USER:$GROUP *  -v
     drush pm-enable $THEME --yes $OUTPUT 
     drush variable-set theme_default $THEME $OUTPUT 
-    drush pm-enable $FEATURES $OUTPUT
+    drush pm-enable $ENABLE_MODULES $OUTPUT
     drush features-revert-all --yes $OUPUT
     #enable and set the theme a second time in case the features update broke it
     drush pm-enable $THEME --yes $OUTPUT

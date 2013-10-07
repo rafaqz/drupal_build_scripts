@@ -35,7 +35,7 @@ if [ -d $INSTALL_DIR ]; then
     sudo mv $INSTALL_DIR $CODE_ROLLBACK_DIR -v
     sudo mv $TEMP_DIR $INSTALL_DIR  -v
     sudo ln -s -f $INSTALL_DIR $LIVE_SYMLINK_DIR -v
-    #drush pm-enable 
+    drush pm-enable $ENABLE_MODULES
     drush updatedb --root=$INSTALL_DIR $OUTPUT
     drush cache-clear drush --root=$INSTALL_DIR $OUTPUT
     drush features-revert-all --yes --root=$INSTALL_DIR $OUTPUT
