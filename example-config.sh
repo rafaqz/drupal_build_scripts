@@ -17,7 +17,7 @@ THEME='' # Changing the theme name may break the block layout.
 # Make file location. Only change this if you know what you are doing.
 MAKE_FILE=''
 
-# List extra feature modules to enable, separated by spaces or commas.
+# List extra features and  modules to enable, separated by spaces or commas.
 ENABLE_MODULES=''
 
 # Build site with development repositories or just production files.
@@ -33,8 +33,12 @@ CLEAN=''
 OUTPUT=$DEBUG
 
 # Set your installation directory here.
+
+#Directory apache points to (should not exist, the scripts will make a simlink here)
 LIVE_SYMLINK_DIR=""
+#Base directory for the project, that will contain the code, files and rollback dirs.
 BASE_DIR=""
+
 INSTALL_DIR="$BASE_DIR/live_code"
 TEMP_DIR="$BASE_DIR/temp_build"
 
