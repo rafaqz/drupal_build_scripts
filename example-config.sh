@@ -39,9 +39,9 @@ LIVE_SYMLINK_DIR=""
 #Base directory for the project, that will contain the code, files and rollback dirs.
 BASE_DIR=""
 
+# You can probably leave these as is.
 INSTALL_DIR="$BASE_DIR/live_code"
 TEMP_DIR="$BASE_DIR/temp_build"
-
 PERMANENT_FILES_DIR="$BASE_DIR/permanent_files"
 FILES_DIR="$PERMANENT_FILES_DIR/files"
 PRIVATE_DIR="$PERMANENT_FILES_DIR/private"
