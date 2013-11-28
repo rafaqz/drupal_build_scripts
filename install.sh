@@ -33,9 +33,16 @@ if cd $BASE_DIR; then
   if drush make $MAKE_FILE $DRUPAL_DIR --yes --no-gitinfofile $BUILD_TYPE $OUPUT; then
 
     # Make all directoris required for the build and future updates.
+
+    # Make dir for files, private files, settings.php etc to live in permanently.
     mkdir $PERMANENT_FILES_DIR -v
+    # Make Rollback dir for future use.
     mkdir $ROLLBACK_DIR -v
+    # Make rollback sub-dir for database.
     mkdir $DATABASE_ROLLBACK_DIR -v
+    # Make rollback sub-dir for code.
+    mkdir $CODE_ROLLBACK_DIR -v
+    # Make private files dir and link it in the drupal filesystem.
     mkdir $PRIVATE_FILES_DIR -v
     sudo ln -s $PRIVATE_FILES_DIR $DRUPAL_DIR/$DRUPAL_PRIVATE_FILES_DIR -v
 
@@ -46,9 +53,9 @@ if cd $BASE_DIR; then
     drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$DATABASE --account-pass=admin --site-name="$SITE_NAME" --yes $OUPUT
 
     # Move and symlink file directories.
-    sudo mv $BASE_DIR/$FILES_DIR $PERMANENT_FILES_DIR -v
+    sudo mv $DRUPAL_DIR/$DRUPAL_FILES_DIR $PERMANENT_FILES_DIR -v
     sudo ln -s $FILES_DIR $DRUPAL_DIR/$DRUPAL_FILES_DIR -v
-    sudo mv $BASE_DIR/$DRUPAL_SETTINGS_PHP $PERMANENT_FILES_DIR -v
+    sudo mv $DRUPAL_DIR/$DRUPAL_SETTINGS_PHP $PERMANENT_FILES_DIR -v
     sudo ln -s $PERMANENT_FILES_DIR/settings.php $DRUPAL_DIR/$DRUPAL_SETTINGS_PHP -v
     sudo chown -R $USER:$GROUP $BASE_DIR/*
 
