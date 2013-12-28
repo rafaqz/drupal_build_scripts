@@ -70,15 +70,7 @@ if cd $BASE_DIR; then
     drush pm-enable $THEME --yes $OUTPUT
     drush variable-set theme_default $THEME $OUTPUT 
 
-    # Generate random content and users.
-    if $GENERATE_RANDOM_CONTENT; then
-      drush genu $GEN_USER $OUTPUT 
-      for i in "${GEN_CONTENT[@]}"
-      do
-        drush genc --types=${GEN_CONTENT[i]} $OUPUT
-      done
-      drush nodequeue-generate-all $OUPUT
-    fi
+    # Creat symlink to drupal dir for apache etc.
     sudo ln -s -f $DRUPAL_DIR $LIVE_SYMLINK_DIR -v
 
   # Handle failed drush make build.
