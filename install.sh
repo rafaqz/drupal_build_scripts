@@ -64,8 +64,8 @@ if cd $BASE_DIR; then
     drush pm-enable $THEME --yes $OUTPUT 
     drush variable-set theme_default $THEME $OUTPUT 
     drush pm-enable $ENABLE_MODULES $OUTPUT
+    # Revert all features.
     drush features-revert-all --yes $OUPUT
-
     # Enable and set the theme a second time in case the features update broke it.
     drush pm-enable $THEME --yes $OUTPUT
     drush variable-set theme_default $THEME $OUTPUT 
