@@ -63,14 +63,16 @@ if cd $BASE_DIR; then
     cd $DRUPAL_DIR
     drush pm-enable $THEME --yes $OUTPUT 
     drush variable-set theme_default $THEME $OUTPUT 
+    # Revert core features, so all fields etc are available for dependencies without errors.
+    drush features-revert-all --yes $OUPUT
     drush pm-enable $ENABLE_MODULES $OUTPUT
     # Revert all features.
-    drush features-revert-all --yes $OUPUT
+    drush, features-revert-all --yes $OUPUT
     # Enable and set the theme a second time in case the features update broke it.
     drush pm-enable $THEME --yes $OUTPUT
     drush variable-set theme_default $THEME $OUTPUT 
 
-    # Creat symlink to drupal dir for apache etc.
+    # Create symlink to drupal dir for apache etc.
     sudo ln -s -f $DRUPAL_DIR $LIVE_SYMLINK_DIR -v
 
   # Handle failed drush make build.
