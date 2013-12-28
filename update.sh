@@ -45,7 +45,7 @@ if [ -d $DRUPAL_DIR ]; then
     # Run database updates.
     drush updatedb --root=$DRUPAL_DIR $OUTPUT
     # Cache clear again.
-    drush cache-clear drush --root=$DRUPAL_DIR $OUTPUT
+    drush cache-clear all --root=$DRUPAL_DIR $OUTPUT
     # Revert all features.
     drush features-revert-all --yes --root=$DRUPAL_DIR $OUTPUT
     # Turn off maintenence mode.
