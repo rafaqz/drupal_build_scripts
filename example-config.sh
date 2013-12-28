@@ -54,11 +54,3 @@ DRUPAL_SETTINGS_PHP="sites/default/settings.php"
 ROLLBACK_DIR="$BASE_DIR/rollback"
 DATABASE_ROLLBACK_DIR="$ROLLBACK_DIR/database"
 CODE_ROLLBACK_DIR="$ROLLBACK_DIR/code"
-
-# Set to true or false
-GENERATE_RANDOM_CONTENT=false
-# Number of users to generate
-GEN_USER='10'
-# TO generate content list the node type to generate, the numer of nodes then number of comments, separated by a space.
-GEN_CONTENT=('group 7', 'closed_group 4', 'conversation 10 8', 'organisation 20')
-
