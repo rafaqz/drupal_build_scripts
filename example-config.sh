@@ -17,11 +17,8 @@ THEME='' # Changing the theme name may break the block layout.
 # Make file location. Only change this if you know what you are doing.
 MAKE_FILE=''
 
-# List extra modules to enable, separated by spaces and/or commas.
-ENABLE_MODULES=''
-
-# List extra modules to disable, separated by spaces and/or commas.
-DISABLE_MODULES=''
+# URL of list of modules enabled, separated by spaces and/or commas.
+ENABLE_MODULE_LIST=''
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'

@@ -45,6 +45,8 @@ if cd $BASE_DIR; then
     # Make private files dir and link it in the drupal filesystem.
     mkdir $PRIVATE_FILES_DIR -v
     sudo ln -s $PRIVATE_FILES_DIR $DRUPAL_DIR/$DRUPAL_PRIVATE_FILES_DIR -v
+    # Make dir for module enabled/usused lists.
+    mkdir $MODULE_LIST_DIR -v
 
     cd $DRUPAL_DIR
     # Install drupal.
