@@ -25,7 +25,7 @@ if [ -d $DRUPAL_DIR ]; then
     sudo chown -R $USER:$GROUP $TEMP_DIR
 
     # Get a list of all modules that should be enabled. 
-    wget -N $MODULE_ENABLED_LIST $MODULE_LIST_DIR/enabled.txt
+    wget -N -O $MODULE_LIST_DIR/enabled.txt $MODULE_ENABLED_LIST 
     # List all available modules.
     drush pm-list --root=$DRUPAL_DIR $OUTPUT --pipe | sort > $MODULE_LIST_DIR/all.txt
     # List all available modules that aren't in the enabled list.
