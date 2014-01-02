@@ -67,7 +67,9 @@ if cd $BASE_DIR; then
     drush variable-set theme_default $THEME $OUTPUT 
     # Revert core features, so all fields etc are available for dependencies without errors.
     drush features-revert-all --yes $OUPUT
-    drush pm-enable $ENABLE_MODULES $OUTPUT
+    # Get a list of all modules that should be enabled, and enable them. 
+    wget -N -O $MODULE_LIST_DIR/enabled.txt $MODULE_ENABLED_LIST 
+    drush pm-enable $($MODULE_LIST_DIR/enabled.txt) --root=$DRUPAL_DIR $OUTPUT
     # Revert all features.
     drush, features-revert-all --yes $OUPUT
     # Clear caches.
