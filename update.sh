@@ -49,6 +49,8 @@ if [ -d $DRUPAL_DIR ]; then
     sudo mv $TEMP_DIR $DRUPAL_DIR  -v
     # Symlink the new live dir to the live http dir.
     sudo ln -s -f $DRUPAL_DIR $LIVE_SYMLINK_DIR -v
+
+    drush registry-rebuild --root=$DRUPAL_DIR $OUTPUT
     # Enable any extra modules/features.
     drush pm-enable $(cat $MODULE_LIST_DIR/enabled.txt) --root=$DRUPAL_DIR $OUTPUT --yes
     # Run database updates.
