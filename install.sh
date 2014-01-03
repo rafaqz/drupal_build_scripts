@@ -69,7 +69,7 @@ if cd $BASE_DIR; then
     drush features-revert-all --yes $OUPUT
     # Get a list of all modules that should be enabled, and enable them. 
     wget -N -O $MODULE_LIST_DIR/enabled.txt $MODULE_ENABLED_LIST 
-    drush pm-enable $($MODULE_LIST_DIR/enabled.txt) --root=$DRUPAL_DIR $OUTPUT
+    drush pm-enable $(cat $MODULE_LIST_DIR/enabled.txt) --root=$DRUPAL_DIR $OUTPUT --yes
     # Revert all features.
     drush, features-revert-all --yes $OUPUT
     # Clear caches.

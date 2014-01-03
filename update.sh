@@ -31,7 +31,7 @@ if [ -d $DRUPAL_DIR ]; then
     # List all available modules that aren't in the enabled list.
     comm -23 $MODULE_LIST_DIR/all.txt $MODULE_LIST_DIR/enabled.txt > $MODULE_LIST_DIR/unused.txt
     # Make sure we disable all unused modules before updating code.
-    drush dis $($MODULE_LIST_DIR/unused.txt) --root=$DRUPAL_DIR $OUTPUT            
+    drush dis $(cat $MODULE_LIST_DIR/unused.txt) --root=$DRUPAL_DIR $OUTPUT --yes
 
     # Remove old rollback code and database dump
     sudo rm -r $CODE_ROLLBACK_DIR
@@ -50,7 +50,7 @@ if [ -d $DRUPAL_DIR ]; then
     # Symlink the new live dir to the live http dir.
     sudo ln -s -f $DRUPAL_DIR $LIVE_SYMLINK_DIR -v
     # Enable any extra modules/features.
-    drush pm-enable $($MODULE_LIST_DIR/enabled.txt) --root=$DRUPAL_DIR $OUTPUT
+    drush pm-enable $(cat $MODULE_LIST_DIR/enabled.txt) --root=$DRUPAL_DIR $OUTPUT --yes
     # Run database updates.
     drush updatedb --root=$DRUPAL_DIR $OUTPUT
     # Cache clear again.
