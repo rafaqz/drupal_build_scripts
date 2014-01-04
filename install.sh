@@ -32,8 +32,8 @@ if cd $BASE_DIR; then
   # Build codebase with drush make.
   if drush make $MAKE_FILE $DRUPAL_DIR --yes --no-gitinfofile $BUILD_TYPE $OUPUT; then
 
-    # Make all directoris required for the build and future updates.
-
+    ## Make all directoris required for the build and future updates.
+    
     # Make dir for files, private files, settings.php etc to live in permanently.
     mkdir $PERMANENT_FILES_DIR -v
     # Make Rollback dir for future use.
@@ -42,16 +42,18 @@ if cd $BASE_DIR; then
     mkdir $DATABASE_ROLLBACK_DIR -v
     # Make rollback sub-dir for code.
     mkdir $CODE_ROLLBACK_DIR -v
-    # Make private files dir and link it in the drupal filesystem.
+    # Make private files dir.
     mkdir $PRIVATE_FILES_DIR -v
-    sudo ln -s $PRIVATE_FILES_DIR $DRUPAL_DIR/$DRUPAL_PRIVATE_FILES_DIR -v
     # Make dir for module enabled/usused lists.
     mkdir $MODULE_LIST_DIR -v
+    # Set permissions on all folders.
+    sudo chmod 775 $BASE_DIR/*
+    # Link private files into the drupal file system.
+    sudo ln -s $PRIVATE_FILES_DIR $DRUPAL_DIR/$DRUPAL_PRIVATE_FILES_DIR -v
 
+    ## Install drupal.
     cd $DRUPAL_DIR
-    # Install drupal.
     echo "*** Installing $SITE_NAME to $DATABASE database as mysql user $MYSQL_USER ***"
-    echo "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$DATABASE --account-pass=admin --site-name=$SITE_NAME --yes $OUPUT"
     drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$DATABASE --account-pass=admin --site-name="$SITE_NAME" --yes $OUPUT
 
     # Move and symlink file directories.
@@ -59,6 +61,8 @@ if cd $BASE_DIR; then
     sudo ln -s $FILES_DIR $DRUPAL_DIR/$DRUPAL_FILES_DIR -v
     sudo mv $DRUPAL_DIR/$DRUPAL_SETTINGS_PHP $PERMANENT_FILES_DIR -v
     sudo ln -s $PERMANENT_FILES_DIR/settings.php $DRUPAL_DIR/$DRUPAL_SETTINGS_PHP -v
+
+    # Set ownership of all files and directories.
     sudo chown -R $USER:$GROUP $BASE_DIR/*
 
     # Run drush commands to enable extra site modules and theme.
