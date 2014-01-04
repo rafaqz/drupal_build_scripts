@@ -65,8 +65,8 @@ if cd $BASE_DIR; then
     # Set ownership of all files and directories.
     sudo chown -R $USER:$GROUP $BASE_DIR/*
     # Set permissions on features dir. @TODO make this only for dev.
-    sudo chmod -R 775 $DRUPAL_DIR/profiles/$PROFILES/module/features
-    sudo chmod -R 775 $DRUPAL_DIR/sites/all/module/features
+    sudo chmod -R 775 $DRUPAL_DIR/profiles/$PROFILES/modules/features
+    sudo chmod -R 775 $DRUPAL_DIR/sites/all/modules/features
 
     # Run drush commands to enable extra site modules and theme.
     cd $DRUPAL_DIR
