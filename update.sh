@@ -38,7 +38,7 @@ if [ -d $DRUPAL_DIR ]; then
     sudo rm $DATABASE_ROLLBACK_DIR/rollback.sql
 
     # Put the site in maintenence mode to prevent any errors or saves to the database.
-    drush variable-set --root=$DRUPAL_DIR $OUTPUT
+    drush variable-set --always-set maintenance_mode 1 --root=$DRUPAL_DIR $OUTPUT
     # Clear caches.
     drush cache-clear all --root=$DRUPAL_DIR $OUTPUT
     # Create new database dump for rollback on failure.
@@ -54,6 +54,8 @@ if [ -d $DRUPAL_DIR ]; then
     # Enable any extra modules/features.
     drush pm-enable $(cat $MODULE_LIST_DIR/enabled.txt) --root=$DRUPAL_DIR $OUTPUT --yes
     # Run database updates.
+    drush pm-enable $THEME --yes $OUTPUT
+    drush variable-set theme_default $THEME $OUTPUT 
     drush updatedb --root=$DRUPAL_DIR $OUTPUT
     # Cache clear again.
     drush cache-clear all --root=$DRUPAL_DIR $OUTPUT
