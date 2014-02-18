@@ -1,9 +1,20 @@
 #!/bin/bash
 
+# Project name must be owercase characters only, no nmbers, spaces or other characters.
+PROJECT_NAME=''
+# How many code and database backup instances to have in the rotation.
+INSTANCES='6'
+
+# Set the base directory for the project files, that will contain the code and files dirs.
+# This dir must allready exist.
+BASE_DIR=""
+
+# Set the directory apache points to (should not exist, the scripts will repeatedly make a simlink here)
+LIVE_SYMLINK_DIR=""
+
 # Set your mysql user and password here.
 MYSQL_USER=''
 MYSQL_PASS=''
-DATABASE=''
 
 # Set your linux/mac user and password here (the group is usually 'www-data' for a ubuntu lamp stack, 'daemon' for bitnami).
 USER=''
@@ -11,14 +22,13 @@ GROUP=''
 
 # Change the site name here. you can also change this easily after install.
 SITE_NAME=''
+# Set the site profile
 PROFILE='collabco'
-THEME='' # Changing the theme name may break the block layout.
-
 # Make file location. Only change this if you know what you are doing.
 MAKE_FILE=''
+# Set the theme (should possibly remove this)
+THEME='' 
 
-# URL of list of modules enabled, separated by spaces and/or commas.
-MODULE_ENABLED_LIST=''
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'
@@ -26,29 +36,17 @@ STAGE=''
 # $DEV or $STAGE
 BUILD_TYPE=$DEV
 
-# Debugging.
+# Debugging output.
 DEBUG='--debug -v'
 CLEAN=''
 # $DEBUG or $CLEAN
 OUTPUT=$DEBUG
 
-# Set your installation directory here.
-
-#Directory apache points to (should not exist, the scripts will make a simlink here)
-LIVE_SYMLINK_DIR=""
-#Base directory for the project, that will contain the code, files and rollback dirs.
-BASE_DIR=""
-
-# You can probably leave these as is.
-DRUPAL_DIR="$BASE_DIR/live_code"
-TEMP_DIR="$BASE_DIR/temp_build"
+# Directory structure. You can probably leave these as is.
+CODE_DIR="$BASE_DIR/code/"
 PERMANENT_FILES_DIR="$BASE_DIR/permanent_files"
 FILES_DIR="$PERMANENT_FILES_DIR/files"
 PRIVATE_FILES_DIR="$PERMANENT_FILES_DIR/private"
 DRUPAL_FILES_DIR="sites/default/files"
 DRUPAL_PRIVATE_FILES_DIR="sites/default/private"
 DRUPAL_SETTINGS_PHP="sites/default/settings.php"
-ROLLBACK_DIR="$BASE_DIR/rollback"
-DATABASE_ROLLBACK_DIR="$ROLLBACK_DIR/database"
-CODE_ROLLBACK_DIR="$ROLLBACK_DIR/code"
-MODULE_LIST_DIR="$BASE_DIR/module_lists"
