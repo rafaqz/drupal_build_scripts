@@ -33,7 +33,7 @@ function rollback {
 }
 
 function build {
-  check_dir $BASE_DIR
+  check_dir $PROJECT_DIR
   set_new_instance_dir
   make
   link_files_dirs
