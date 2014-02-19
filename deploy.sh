@@ -6,4 +6,5 @@ source "$SCRIPT_DIR/config.sh"
 source "$SCRIPT_DIR/functions.sh"
 
 # Run supplied command.
+echo "Running $@ ..."
 eval "$@"
