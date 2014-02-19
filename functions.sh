@@ -19,6 +19,16 @@ function build {
   set_theme
 }
 
+function install { 
+  echo "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
+  run_cmd "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUPUT --root=$new_instance_dir"
+}
+
+function make {
+  run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $BUILD_TYPE $OUPUT"
+}
+
+
 function confirm {
   # Check if this is for reals.
   while true; do
@@ -79,11 +89,8 @@ function set_permissions {
 }
 
 function link_files_dirs {
-  if ! [ "ln -s $PRIVATE_FILES_DIR $new_instance_dir/$DRUPAL_PRIVATE_FILES_DIR -v" ] && [ "ln -s $FILES_DIR $new_instance_dir/$DRUPAL_FILES_DIR -v" ]
-  then
-    echo "Could not link files dirs $PRIVATE_FILES_DIR to $new_instance_dir/$DRUPAL_PRIVATE_FILES_DIR or $FILES_DIR to $new_instance_dir/$DRUPAL_FILES_DIR"
-    exit 1
-  fi
+  run_cmd "ln -s $PRIVATE_FILES_DIR $new_instance_dir/$DRUPAL_PRIVATE_FILES_DIR -v"
+  run_cmd "ln -s $FILES_DIR $new_instance_dir/$DRUPAL_FILES_DIR -v"
 }
     
 function make_files_dirs {
@@ -92,14 +99,6 @@ function make_files_dirs {
   run_cmd "mkdir $FILES_DIR -v"
   run_cmd "mkdir $PRIVATE_FILES_DIR -v"
   run_cmd "mkdir $CODE_DIR -v"
-}
-
-function install { echo "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
-  run_cmd "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUPUT --root=$new_instance_dir"
-}
-
-function make {
-  run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $BUILD_TYPE $OUPUT"
 }
 
 function check_dir {
@@ -121,7 +120,6 @@ function clear_new_instance_dir {
   fi
   run_cmd "sudo rm -r $new_instance_dir"
 }
-
 
 function get_current_instance {
   #### Find current insance variables. ####
