@@ -101,8 +101,8 @@ function cache_clear {
 function enable_modules {
   # Get a list of all modules that should be enabled, and enable them. 
   # This allows adding features not in the core profile.
-  run_cmd "wget -N -O $PROJECT_DIR/enabled.txt $MODULE_ENABLED_LIST"
-  run_cmd "drush pm-enable $(cat $PROJECT_DIR/enabled.txt) --root=$new_instance_dir $OUTPUT --yes"
+  run_cmd "wget -N -O $new_instance_dir/enabled.txt $MODULE_ENABLED_LIST"
+  run_cmd "drush pm-enable $(cat $new_instance_dir/enabled.txt) --root=$new_instance_dir $OUTPUT --yes"
 }
 
 function symlink_live {
