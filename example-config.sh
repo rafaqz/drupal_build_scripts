@@ -4,10 +4,10 @@
 PROJECT_NAME=''
 # How many code and database backup instances to have in the rotation.
 INSTANCES='6'
-
 # Set the base directory for the project files, that will contain the code and files dirs.
 # This dir must allready exist.
-BASE_DIR=""
+PROJECT_DIR=""
+
 
 # Set the directory apache points to (should not exist, the scripts will repeatedly make a simlink here)
 LIVE_SYMLINK_DIR=""
@@ -43,8 +43,8 @@ CLEAN=''
 OUTPUT=$DEBUG
 
 # Directory structure. You can probably leave these as is.
-CODE_DIR="$BASE_DIR/code/"
-PERMANENT_FILES_DIR="$BASE_DIR/permanent_files"
+CODE_DIR="$PROJECT_DIR/code/"
+PERMANENT_FILES_DIR="$PROJECT_DIR/permanent_files"
 FILES_DIR="$PERMANENT_FILES_DIR/files"
 PRIVATE_FILES_DIR="$PERMANENT_FILES_DIR/private"
 DRUPAL_FILES_DIR="sites/default/files"
