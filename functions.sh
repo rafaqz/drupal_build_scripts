@@ -1,11 +1,43 @@
+#!/bin/bash
+
+function install {
+  new_instance_name=$PROJECT_NAME"1"
+  set_new_instance_dir
+  echo "Install the $PROJECT_NAME project."
+  echo "This will overwrite the $new_instance_name database and code, do you want to do that? (y or n)" 
+  confirm 
+  make_dirs
+  set_permissions
+  build
+}
+
+function update {
+  get_current_instance
+  set_new_instance
+  clear_new_instance_dir
+  echo "Update the $PROJECT_NAME project."
+  echo "This will overwrite the $new_instance_name database and code, do you want to do that? (y or n)" 
+  confirm 
+  build
+  sync
+  symlink_live
+}
+
 # The build script...
+function rollback {
+  get_current_instance
+  rollback_new_instance
+  echo "You are about to rollback to the last installed instance of $PROJECT_NAME, to $current_instance_name at $new_instance_dir"
+  confirm 
+  symlink_live
+}
 
 function build {
-  check_dir
+  check_dir $BASE_DIR
   set_new_instance_dir
   make
   link_files_dirs
-  install
+  site_install
   set_permissions
   # Enable site theme before features are reverted.
   set_theme
@@ -19,7 +51,7 @@ function build {
   set_theme
 }
 
-function install { 
+function site_install { 
   echo "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
   run_cmd "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUPUT --root=$new_instance_dir"
 }
@@ -28,11 +60,10 @@ function make {
   run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $BUILD_TYPE $OUPUT"
 }
 
-
 function confirm {
   # Check if this is for reals.
   while true; do
-    read -p "This will overwrite the $new_instance_name database and code, do you want to do that? (y or n) " yn
+    read -p "Please confirm (yes or no) y/n" yn
     case $yn in
       [Yy]* ) break;;
       [Nn]* ) exit;;
@@ -76,7 +107,7 @@ function enable_modules {
 
 function symlink_live {
   # Create symlink to drupal dir for apache etc.
-  run_cmd "sudo ln -s -f $new_instance_dir $LIVE_SYMLINK_DIR -v"
+  run_cmd "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
 }
 
 function set_permissions {
@@ -102,15 +133,21 @@ function make_files_dirs {
 }
 
 function check_dir {
-  if ! [ "cd $PROJECT_DIR" ]; then
+  if ! [ "cd $1" ]; then
     # Handle missing install dir. 
-    echo "Your PROJECT_DIR $PROJECT_DIR dosn't exist, you may need to create it or set it by editing the config file"
+    echo "Your $2 $1 directory dosn't exist, you may need to create it or set it by editing the config file"
     exit 1
   fi
 }
 
+function set_current_instance_dir {
+  current_instance_dir="$CODE_DIR/$current_instance_name"
+  check_dir $current_instance_dir
+}
+
 function set_new_instance_dir {
   new_instance_dir="$CODE_DIR/$new_instance_name"
+  check_dir $new_instance_dir
 }
 
 function clear_new_instance_dir {
@@ -125,13 +162,15 @@ function get_current_instance {
   #### Find current insance variables. ####
   # Get suffix number of current live database name, the first WORD after '--database=' in drush sql-connect output.
   current_instance_num=$(drush sql-connect --root=$LIVE_SYMLINK_DIR | awk -F"--database=" '{print $2}' | awk '{print $1}' | tr -dc '[0-9]')
-  check_current_instance
+  check_current_instance_num
   current_instance_name=$PROJECT_NAME$current_instance_num
   set_current_alias
+  echo $current_instance_name
 }
 
 function set_new_instance {
-  check_current_instance
+  check_current_instance_num
+  check_dir $current_instance_dir
   #### Set new insance variables. ####
   new_instance_num=$[$current_instance_num+1]
   # Limit number of instances, set back to start when larger than $NUM_INSTANCES.
@@ -143,11 +182,25 @@ function set_new_instance {
   set_new_alias
 }
 
-function check_current_instance {
+function rollback_new_instance {
+  check_current_instance_num
+  #### Set new insance variables. ####
+  new_instance_num=$[$current_instance_num-1]
+  # Limit number of instances, set back to start when larger than $NUM_INSTANCES.
+  if [ $new_instance_num -lt 1 ]; then 
+    new_instance_num=$NUM_INSTANCES
+  fi
+  new_instance_name=$PROJECT_NAME$new_instance_num
+  set_new_instance_dir
+  set_new_alias
+}
+
+function check_current_instance_num {
   if [[ -z "$current_instance_num" ]]; then
     echo "No current instance available"
     exit 1
   fi
+  check_dir $current_instance_dir
 }
 
 function run_cmd() {
@@ -157,6 +210,6 @@ function run_cmd() {
     fi
     popd > /dev/null
   else
-    die "Wanted to run ${1} in ${2} but ${2} does not exist!";
+    die "Tried to run ${1} in ${2} but ${2} does not exist!";
   fi
 }
