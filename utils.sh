@@ -23,7 +23,7 @@ dep() {
     completed_funcs[$1]=TRUE;
   fi
   # Print function names
-  echo "***** $3 $2 $1 
+  echo "***** $3 $2 $1 "
 }
 
 exists() {
