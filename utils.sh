@@ -22,7 +22,8 @@ dep() {
     $1
     completed_funcs[$1]=TRUE;
   fi
-  echo "***** "$2">>"$1 
+  # Print function names
+  echo "***** $3 $2 $1 
 }
 
 exists() {
