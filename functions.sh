@@ -7,7 +7,7 @@ source "$SCRIPT_DIR/utils.sh"
 declare -A completed_funcs
 
 install() {
-  action="new"
+  action="install"
   confirm "About to install the $PROJECT_NAME project and overwrite the $new_instance_name database and code" 
   dep make_files_dirs
   call set_permissions
@@ -19,7 +19,6 @@ update() {
   action="update"
   dep check_current_instance_vars
   dep check_new_instance_vars
-  echo ""
   confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
   call build
   call sync
@@ -99,12 +98,12 @@ get_current_instance() {
   echo "Current instance: $current_instance_name"
 }
 
-set_new_instance() {
+get_new_instance() {
   case $action in
-    new )
+    install )
       new_instance_num="1"
       ;;
-    update )
+    update|rollforward )
       dep check_current_instance_vars
       new_instance_num=$[$current_instance_num+1]
       # Limit number of instances, set back to start when larger than $PROJECT_INSTANCES.
@@ -199,23 +198,24 @@ check_current_instance_dir() {
 
 check_new_instance_dir() {
   dep check_new_instance_vars
+  check_dir $new_instance_dir
 }
 
 set_current_alias() {
   dep check_current_instance_vars
-  dep check_drush_aliases
+  dep build_drush_aliases
   current_alias="@"$PROJECT_NAME".local"$current_instance_num
   echo $current_alias
 }
 
 set_new_alias() {
   dep check_new_instance_vars
-  dep check_drush_aliases
+  dep build_drush_aliases
   new_alias="@"$PROJECT_NAME".local"$new_instance_num 
 }
 
 check_new_instance_vars() {
-  dep set_new_instance
+  dep get_new_instance
   if [[ -z "$new_instance_dir" ]]; then
     die "No new instance directory available"
   fi
@@ -261,15 +261,15 @@ build_drush_aliases() {
   echo "**** FILTERED TEMPLATE: $template"
   echo "$template" > $alias_file
   drush cc drush
+  call check_drush_aliases
 }
 
 check_drush_aliases() {
-  dep build_drush_aliases
   last_alias="@"$PROJECT_NAME".local"$PROJECT_INSTANCES
   if ! [[ "$(drush sa | grep $last_alias)" == $last_alias ]]  ; then
     die "Drush aliases are not available"
   else
-    echo "Drush aliases are working."
+    echo "Drush aliases are available"
   fi
 }
 
