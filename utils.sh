@@ -19,16 +19,16 @@ completed() {
 
 dep() {
   # Print function names
-  printf "**** Dep: $1\t\t\tin ${FUNCNAME[ 1 ]}\n"
+  printf "**** Dep: \"$1\"\t\t\tCalled from function: \"${FUNCNAME[ 1 ]}\"\n"
   if ! exists $1 in completed_funcs; then
-    printf ">>>> Run: $1\t\t\tin ${FUNCNAME[ 1 ]}\n"
+    printf ">>>> Run: \"$1\"\t\t\tCalled from function: \"${FUNCNAME[ 1 ]}\"\n"
     $1
     completed_funcs[$1]=TRUE;
   fi
 }
 
 call() {
-  printf ">>>> Run: $1\t\t\tfrom function: ${FUNCNAME[ 1 ]}\n"
+  printf ">>>> Run: \"$1\"\t\t\tCalled from function: \"${FUNCNAME[ 1 ]}\"\n"
   $1
 }
 
