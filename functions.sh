@@ -239,6 +239,7 @@ build_drush_aliases() {
   template=$(<$template_file)
   echo "**** TEMPLATE: $template"
   template=${template//"{{project_instances}}"/$PROJECT_INSTANCES}
+  template=${template//"{{project_name}}"/$PROJECT_NAME}
   template=${template//"{{project_code_dir}}"/$CODE_DIR}
   template=${template//"{{root}}"/$LIVE_SYMLINK_DIR}
   template=${template//"{{uri}}"/$LIVE_URI}
