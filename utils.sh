@@ -28,7 +28,7 @@ dep() {
 }
 
 call() {
-  printf ">>>> Run: $1\t\t\tin ${FUNCNAME[ 1 ]}\n"
+  printf ">>>> Run: $1\t\t\tfrom function: ${FUNCNAME[ 1 ]}\n"
   $1
 }
 
