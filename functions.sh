@@ -22,6 +22,7 @@ update() {
   confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
   call build
   call sync
+  call cache_clear
   call symlink_live
 }
 
@@ -57,7 +58,6 @@ build() {
   call enable_modules
   # Revert all features.
   call revert
-  call cache_clear
   call set_theme
 }
 
@@ -248,9 +248,9 @@ check_project_dir() {
 build_drush_aliases() {
   check_dir $DRUSH_ALIAS_DIR
   alias_file=$DRUSH_ALIAS_DIR"/"$PROJECT_NAME".aliases.drushrc.php"
+
+  # What follows some damn ugly template string replacement. Enjoy.
   template_file=$SCRIPT_DIR/aliases.drushrc.php
-  
-  # What follows some damn ugly templating. Enjoy.
   template=$(<$template_file)
   echo "**** TEMPLATE: $template"
   template=${template//"{{project_instances}}"/$PROJECT_INSTANCES}
@@ -260,11 +260,11 @@ build_drush_aliases() {
   template=${template//"{{uri}}"/$LIVE_URI}
   echo "**** FILTERED TEMPLATE: $template"
   echo "$template" > $alias_file
-  drush cc drush
   call check_drush_aliases
 }
 
 check_drush_aliases() {
+  drush cc drush
   last_alias="@"$PROJECT_NAME".local"$PROJECT_INSTANCES
   if ! [[ "$(drush sa | grep $last_alias)" == $last_alias ]]  ; then
     die "Drush aliases are not available"
