@@ -19,16 +19,16 @@ completed() {
 
 dep() {
   # Print function names
-  echo "***** Dep: $1 "
+  printf "**** Dep: $1\t\t\tin ${FUNCNAME[ 1 ]}\n"
   if ! exists $1 in completed_funcs; then
-    echo "***** Run: $1 "
+    printf ">>>> Run: $1\t\t\tin ${FUNCNAME[ 1 ]}\n"
     $1
     completed_funcs[$1]=TRUE;
   fi
 }
 
 call() {
-  echo "***** Run: $1 "
+  printf ">>>> Run: $1\t\t\tin ${FUNCNAME[ 1 ]}\n"
   $1
 }
 
@@ -69,7 +69,12 @@ confirm() {
   done
 }
 
-replace() {
-  run "sed -i 's|$1|$2|g' $3"  
+set_dir_permissions() {
+  printf "Changing permissions of all directories inside \"${1}\" to \"${2}\"...\n"
+  run "find ${1} -type d -exec chmod ${2} '{}' \;"
 }
-  
+
+set_file_permissions() {
+  printf "Changing permissions of all files inside \"${1}\" to \"${2}\"...\n"
+  run "find ${1} -type f -exec chmod ${2} '{}' \;"
+}
