@@ -10,10 +10,10 @@ install() {
   action="new"
   echo "Install the $PROJECT_NAME project."
   confirm "This will overwrite the $new_instance_name database and code, do you want to do that?" 
-  make_files_dirs
-  set_permissions
-  build
-  symlink_live
+  dep make_files_dirs
+  call set_permissions
+  call build
+  call symlink_live
 }
 
 update() {
@@ -22,9 +22,9 @@ update() {
   dep check_new_instance_vars
   echo "Update the $PROJECT_NAME project."
   confirm "This will overwrite the $new_instance_name database and code, do you want to do that?" 
-  build
-  sync
-  symlink_live
+  call build
+  call sync
+  call symlink_live
 }
 
 # The build script...
@@ -33,7 +33,7 @@ rollback() {
   dep check_current_instance_vars
   dep check_new_instance_vars
   confirm "This will roll back from $current_instance_name to the last installed instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
-  symlink_live
+  call symlink_live
 }
 
 build() {
@@ -43,15 +43,15 @@ build() {
   dep site_install
   dep set_permissions
   # Enable site theme before features are reverted.
-  set_theme
+  call set_theme
   # Revert core features so all fields etc are available for dependencies without errors.
-  revert
+  call revert
   # Enable any extra modules or features.
-  enable_modules
+  call enable_modules
   # Revert all features.
-  revert
-  cache_clear
-  set_theme
+  call revert
+  call cache_clear
+  call set_theme
 }
 
 site_install() { 
