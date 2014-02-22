@@ -152,32 +152,30 @@ symlink_live() {
   run "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
 }
 
+set_dir_permissions() {
+  printf "Changing permissions of all directories inside \"${1}\" to \"${2}\"...\n"
+  run "find . -type d -exec chmod ${2} '{}' \;"
+}
+
+set_file_permissions() {
+  printf "Changing permissions of all files inside \"${1}\" to \"${2}\"...\n"
+  run "find . -type f -exec chmod ${2} '{}' \;"
+}
+
 set_permissions() {
   dep check_new_instance_dir
+  
+  sudo echo "Need sudo to set file permissions."
   # Set ownership of all files and directories.
   printf "Changing ownership of all contents of \"${PROJECT_DIR}\":\nuser => \"${USER}\" \t group => \"${GROUP}\"\n"
   run "sudo chown -R $USER:$GROUP $PROJECT_DIR"
   run "sudo chmod 770 $PROJECT_DIR"
 
-  run "cd $new_instance_dir"
+  set_dir_permissions $new_instance_dir 750
+  set_file_permissions $new_instance_dir 640
 
-  printf "Changing permissions of all directories inside \"${new_instance_dir}\" to \"rwxr-x---\"...\n"
-  run "find . -type d -exec chmod u=rwx,g=rx,o= '{}' \;"
-  printf "Changing permissions of all files inside \"${new_instance_dir}\" to \"rw-r-----\"...\n"
-  run "find . -type f -exec chmod u=rw,g=r,o= '{}' \;"
-
-  #run "cd ${new_instance_dir}/cache"
-  #printf "Changing permissions of all directories inside \"${new_instance_dir}/cache\" to \"rwxrwx---\"...\n"
-  #run "find . -type d -exec chmod ug=rwx,o= '{}' \;"
-  #printf "Changing permissions of all files inside \"${new_instance_dir}/cache\" to \"rw-rw----\"...\n"
-  #run "find . -type f -exec chmod u=rw,g=rw,o= '{}' \;"
-
-  run "cd ${PERMANENT_FILES_DIR}"
-  printf "Changing permissions of all files inside all \"files\" directories in \"${PERMANENT_FILES_DIR}\" to \"rw-rw----\"...\n"
-  run "find . -type d -name files -exec chmod ug=rwx,o= '{}' \;"
-  printf "Changing permissions of all directories inside all \"files\" directories in \"${PERMANENT_FILES_DIR}\" to \"rwxrwx---\"...\n"
-  run "find . -type f -exec chmod ug=rw,o= '{}' \;"
-  echo "Done settings proper permissions on files and directories"  
+  set_dir_permissions $PERMANENT_FILES_DIR 770
+  set_file_permissions $PERMANENT_FILES_DIR 660
 }
 
 link_files_dirs() {
