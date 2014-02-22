@@ -23,7 +23,7 @@ dep() {
     completed_funcs[$1]=TRUE;
   fi
   # Print function names
-  echo "***** $3 $2 $1 "
+  echo "***** Called: $3 $2 $1 "
 }
 
 exists() {
@@ -44,9 +44,7 @@ check_dir() {
   if [[ -z "$1" ]]; then
     die "directory variable is empty"
   fi
-  if cd $1; then
-    echo "Directory $1 exists"
-  else
+  if [ ! -d $1 ]; then
     # Handle missing install dir. 
     die "$1 directory dosn't exist"
   fi
