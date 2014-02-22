@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Get current directory and import config and shared functions files.
-SCRIPT_DIR=`dirname $0`
+SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 source "$SCRIPT_DIR/utils.sh"
+
 declare -A completed_funcs
 
 install() {
@@ -187,14 +188,14 @@ check_new_instance_dir() {
 
 set_current_alias() {
   dep check_current_instance_vars
-  dep build_alias_file
+  dep check_drush_aliases
   current_alias="@"$PROJECT_NAME".local"$current_instance_num
   echo $current_alias
 }
 
 set_new_alias() {
   dep check_new_instance_vars
-  dep build_alias_file
+  dep check_drush_aliases
   new_alias="@"$PROJECT_NAME".local"$new_instance_num 
 }
 
@@ -219,8 +220,8 @@ check_current_instance_vars() {
   fi
   if [[ -z "$current_instance_name" ]]; then
     die "No current instance name available"
-  fi
-  if [[ -z "$current_instance_num" ]]; then
+  fi 
+  if [[ -z "$current_instance_num" ]]; then 
     die "No current instance number available"
   fi
 }
@@ -229,15 +230,29 @@ check_project_dir() {
   check_dir $PROJECT_DIR
 }
 
-build_alias_file() {
+build_drush_aliases() {
   check_dir $DRUSH_ALIAS_DIR
   alias_file=$DRUSH_ALIAS_DIR"/"$PROJECT_NAME".aliases.drushrc.php"
-  check_dir $SCRIPT_DIR
-  cp -f /home/raf/Projects/off/scripts/aliases.drushrc.php $alias_file
-  replace "{{project_name}}"      $PROJECT_NAME       $alias_file
-  replace "{{project_instances}}" $PROJECT_INSTANCES  $alias_file
-  replace "{{project_code_dir}}"  $CODE_DIR           $alias_file
-  replace "{{root}}"              $LIVE_SYMLINK_DIR   $alias_file
-  replace "{{uri}}"               $LIVE_SYMLINK_DIR   $alias_file
+  template_file=$SCRIPT_DIR/aliases.drushrc.php
+  
+  # What follows some damn ugly templating. Enjoy.
+  template=$(<$template_file)
+  echo "**** TEMPLATE: $template"
+  template=${template//"{{project_instances}}"/$PROJECT_INSTANCES}
+  template=${template//"{{project_code_dir}}"/$CODE_DIR}
+  template=${template//"{{root}}"/$LIVE_SYMLINK_DIR}
+  template=${template//"{{uri}}"/$LIVE_URI}
+  echo "**** FILTERED TEMPLATE: $template"
+  echo "$template" > $alias_file
   drush cc drush
+}
+
+check_drush_aliases() {
+  dep build_drush_aliases
+  last_alias="@"$PROJECT_NAME".local"$PROJECT_INSTANCES
+  if ! [[ "$(drush sa | grep $last_alias)" == $last_alias ]]  ; then
+    die "Drush aliases are not available"
+  else
+    echo "Drush aliases are working."
+  fi
 }
