@@ -35,6 +35,15 @@ rollback() {
   call symlink_live
 }
 
+rollforward() {
+  action="rollforward"
+  dep check_current_instance_vars
+  dep check_new_instance_vars
+  confirm "About to rollforward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  call symlink_live
+}
+
+
 build() {
   dep check_project_dir
   dep clear_new_instance_dir
@@ -87,7 +96,7 @@ get_current_instance() {
   current_instance_num=$(drush sql-connect --root=$LIVE_SYMLINK_DIR | awk -F"--database=" '{print $2}' | awk '{print $1}' | tr -dc '[0-9]')
   current_instance_name=$PROJECT_NAME$current_instance_num
   current_instance_dir="$CODE_DIR/$current_instance_name"
-  echo $current_instance_name
+  echo "Current instance: $current_instance_name"
 }
 
 set_new_instance() {
@@ -118,7 +127,7 @@ set_new_instance() {
   esac
   new_instance_name=$PROJECT_NAME$new_instance_num
   new_instance_dir="$CODE_DIR/$new_instance_name"
-  echo $new_instance_name
+  echo "New instance: $new_instance_name"
 }
 
 set_theme() {
@@ -150,16 +159,6 @@ symlink_live() {
   dep check_new_instance_dir
   # Create symlink to drupal dir for apache etc.
   run "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
-}
-
-set_dir_permissions() {
-  printf "Changing permissions of all directories inside \"${1}\" to \"${2}\"...\n"
-  run "find . -type d -exec chmod ${2} '{}' \;"
-}
-
-set_file_permissions() {
-  printf "Changing permissions of all files inside \"${1}\" to \"${2}\"...\n"
-  run "find . -type f -exec chmod ${2} '{}' \;"
 }
 
 set_permissions() {
