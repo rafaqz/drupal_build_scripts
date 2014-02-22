@@ -8,8 +8,7 @@ declare -A completed_funcs
 
 install() {
   action="new"
-  echo "Install the $PROJECT_NAME project."
-  confirm "This will overwrite the $new_instance_name database and code, do you want to do that?" 
+  confirm "About to install the $PROJECT_NAME project and overwrite the $new_instance_name database and code" 
   dep make_files_dirs
   call set_permissions
   call build
@@ -20,8 +19,8 @@ update() {
   action="update"
   dep check_current_instance_vars
   dep check_new_instance_vars
-  echo "Update the $PROJECT_NAME project."
-  confirm "This will overwrite the $new_instance_name database and code, do you want to do that?" 
+  echo ""
+  confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
   call build
   call sync
   call symlink_live
@@ -32,7 +31,7 @@ rollback() {
   action="rollback"
   dep check_current_instance_vars
   dep check_new_instance_vars
-  confirm "This will roll back from $current_instance_name to the last installed instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  confirm "About to roll back from $current_instance_name to the last installed instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
   call symlink_live
 }
 
@@ -41,7 +40,7 @@ build() {
   dep clear_new_instance_dir
   dep make
   dep site_install
-  dep set_permissions
+  call set_permissions
   # Enable site theme before features are reverted.
   call set_theme
   # Revert core features so all fields etc are available for dependencies without errors.
@@ -154,12 +153,31 @@ symlink_live() {
 }
 
 set_permissions() {
+  dep check_new_instance_dir
   # Set ownership of all files and directories.
+  printf "Changing ownership of all contents of \"${PROJECT_DIR}\":\nuser => \"${USER}\" \t group => \"${GROUP}\"\n"
   run "sudo chown -R $USER:$GROUP $PROJECT_DIR"
-  run "sudo chmod -R 770 $PROJECT_DIR"
-  # Set permissions on features dir. @TODO make this only for dev. These can fail if they dont exist yet.
-  sudo chmod -R 775 $new_instance_dir/profiles/$PROFILES/modules/features
-  sudo chmod -R 775 $new_instance_dir/sites/all/modules/features
+  run "sudo chmod 770 $PROJECT_DIR"
+
+  run "cd $new_instance_dir"
+
+  printf "Changing permissions of all directories inside \"${new_instance_dir}\" to \"rwxr-x---\"...\n"
+  run "find . -type d -exec chmod u=rwx,g=rx,o= '{}' \;"
+  printf "Changing permissions of all files inside \"${new_instance_dir}\" to \"rw-r-----\"...\n"
+  run "find . -type f -exec chmod u=rw,g=r,o= '{}' \;"
+
+  #run "cd ${new_instance_dir}/cache"
+  #printf "Changing permissions of all directories inside \"${new_instance_dir}/cache\" to \"rwxrwx---\"...\n"
+  #run "find . -type d -exec chmod ug=rwx,o= '{}' \;"
+  #printf "Changing permissions of all files inside \"${new_instance_dir}/cache\" to \"rw-rw----\"...\n"
+  #run "find . -type f -exec chmod u=rw,g=rw,o= '{}' \;"
+
+  run "cd ${PERMANENT_FILES_DIR}"
+  printf "Changing permissions of all files inside all \"files\" directories in \"${PERMANENT_FILES_DIR}\" to \"rw-rw----\"...\n"
+  run "find . -type d -name files -exec chmod ug=rwx,o= '{}' \;"
+  printf "Changing permissions of all directories inside all \"files\" directories in \"${PERMANENT_FILES_DIR}\" to \"rwxrwx---\"...\n"
+  run "find . -type f -exec chmod ug=rw,o= '{}' \;"
+  echo "Done settings proper permissions on files and directories"  
 }
 
 link_files_dirs() {
@@ -257,3 +275,15 @@ check_drush_aliases() {
     echo "Drush aliases are working."
   fi
 }
+
+check_drupal() {
+  if [ -z "${new_instance_dir}" ] || [ ! -d "${new_instance_dir}/sites" ] || [ ! -f "${new_instance_dir}/core/modules/system/system.module" ] && [ ! -f "${new_instance_dir}/modules/system/system.module" ]; then
+      die "Please provide a valid Drupal path."
+  fi
+
+  if [ -z "${USER}" ] || [ $(id -un ${USER} 2> /dev/null) != "${USER}" ]; then
+      die "Please provide a valid user."
+      exit 1
+  fi
+}
+
