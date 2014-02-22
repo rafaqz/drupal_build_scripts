@@ -18,12 +18,13 @@ completed() {
 }
 
 dep() {
+  # Print function names
+  echo "***** Call: $3 $2 $1 "
   if ! exists $1 in completed_funcs; then
     $1
+    echo "***** Run: $3 $2 $1 "
     completed_funcs[$1]=TRUE;
   fi
-  # Print function names
-  echo "***** Called: $3 $2 $1 "
 }
 
 exists() {
