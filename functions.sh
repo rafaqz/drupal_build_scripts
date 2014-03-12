@@ -55,6 +55,7 @@ build() {
   call enable_modules
   # Revert all features.
   call revert
+  call revert
   call set_theme
 }
 
