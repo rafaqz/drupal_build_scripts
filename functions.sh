@@ -36,7 +36,7 @@ rollforward() {
   action="rollforward"
   dep get_current_instance
   dep get_new_instance
-  confirm "About to rollforward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  confirm "About to roll forward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
   call symlink_live
 }
 
@@ -67,6 +67,7 @@ site_install() {
 }
 
 make() {
+  dep get_new_instance
   if cd $new_instance_dir; then
     echo "build dir allredy exists, drush make skipped."
   else
@@ -161,6 +162,7 @@ symlink_live() {
 
 set_permissions() {
   dep check_new_instance_dir
+  dep check_user
   
   sudo echo "Need sudo to set file permissions."
   # Set ownership of all files and directories.
@@ -254,13 +256,13 @@ build_drush_aliases() {
   # What follows some damn ugly template string replacement. Enjoy.
   template_file=$SCRIPT_DIR/aliases.drushrc.php
   template=$(<$template_file)
-  echo "**** TEMPLATE: $template"
+  echo "**** DRUSH ALIAS TEMPLATE: $template"
   template=${template//"{{project_instances}}"/$PROJECT_INSTANCES}
   template=${template//"{{project_name}}"/$PROJECT_NAME}
   template=${template//"{{project_code_dir}}"/$CODE_DIR}
   template=${template//"{{root}}"/$LIVE_SYMLINK_DIR}
   template=${template//"{{uri}}"/$LIVE_URI}
-  echo "**** FILTERED TEMPLATE: $template"
+  echo "**** SUBSTITUTED DRUSH ALIAS TEMPLATE: $template"
   echo "$template" > $alias_file
   call check_drush_aliases
 }
@@ -277,12 +279,12 @@ check_drush_aliases() {
 
 check_drupal() {
   if [ -z "${new_instance_dir}" ] || [ ! -d "${new_instance_dir}/sites" ] || [ ! -f "${new_instance_dir}/core/modules/system/system.module" ] && [ ! -f "${new_instance_dir}/modules/system/system.module" ]; then
-      die "Please provide a valid Drupal path."
-  fi
-
-  if [ -z "${USER}" ] || [ $(id -un ${USER} 2> /dev/null) != "${USER}" ]; then
-      die "Please provide a valid user."
-      exit 1
+    die "Please provide a valid Drupal path."
   fi
 }
 
+check_user() {
+  if [ -z "${USER}" ] || [ $(id -un ${USER} 2> /dev/null) != "${USER}" ]; then
+    die "User $USER doesnt exist. Please provide a valid user."
+  fi
+}
