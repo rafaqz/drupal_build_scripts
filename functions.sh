@@ -28,7 +28,13 @@ rollback() {
   action="rollback"
   dep get_current_instance
   dep get_new_instance
-  confirm "About to roll back from $current_instance_name to the last installed instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  echo "$new_instance_dir/index.php"
+  if test "$new_instance_dir/index.php" -ot "$current_instance_dir/index.php" 
+  then
+    confirm "About to roll back from $current_instance_name to the last installed instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  else
+    die "There are no older instances to roll back to"
+  fi
   call symlink_live
 }
 
@@ -36,7 +42,13 @@ rollforward() {
   action="rollforward"
   dep get_current_instance
   dep get_new_instance
-  confirm "About to roll forward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  echo "$new_instance_dir/index.php"
+  if test "$new_instance_dir/index.php" -nt "$current_instance_dir/index.php" 
+  then
+    confirm "About to roll forward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  else
+    die "There are no new instances to roll forward to"
+  fi
   call symlink_live
 }
 
@@ -55,8 +67,8 @@ build() {
   call enable_modules
   # Revert all features.
   call revert
-  call revert
   call set_theme
+  call cache_clear
 }
 
 site_install() { 
