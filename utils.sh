@@ -15,19 +15,23 @@ run() {
 
 dep() {
   # Print function names
-  printf "*** Dep: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+  debug "Dep" $1 ${FUNCNAME[ 1 ]}
   if ! exists $1 in completed_funcs; then
-    printf ">>> Run: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+    debug "Run" $1 ${FUNCNAME[ 1 ]}
     $1
     completed_funcs[$1]=TRUE;
-    printf ">>> Success: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+    debug "Success" $1 ${FUNCNAME[ 1 ]}
   fi
 }
 
 call() {
-  printf ">>> Run: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+  debug "Run" $1 ${FUNCNAME[ 1 ]}
   $1
-  printf ">>> Success: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+  debug "Success" $1 ${FUNCNAME[ 1 ]}
+}
+
+debug() {
+  printf ">>> $1: \"$2\" ^ Called from: \"$3\"" | column -c 2 -t -s "^"
 }
 
 exists() {

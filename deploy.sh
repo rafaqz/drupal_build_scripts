@@ -7,4 +7,5 @@ source "$SCRIPT_DIR/functions.sh"
 
 # Run supplied command.
 printf ">>> Run \"$@\" ^ Called from shell" | column -c 2 -t -s "^"
+    debug "Run" $@ "shell" 
 eval "$@"
