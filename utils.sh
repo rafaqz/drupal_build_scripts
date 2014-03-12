@@ -1,5 +1,7 @@
 #!/bin/bash
 
+declare -A completed_funcs
+
 run() {
   if pushd "${2}" > /dev/null; then
     if ! eval ${1}; then
@@ -13,19 +15,19 @@ run() {
 
 dep() {
   # Print function names
-  printf "**** Dep: \"$1\" ^ Called from function: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+  printf "*** Dep: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
   if ! exists $1 in completed_funcs; then
-    printf ">>>> Run: \"$1\" ^ Called from function: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+    printf ">>> Run: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
     $1
     completed_funcs[$1]=TRUE;
-    printf ">>>> Success: \"$1\"\n"
+    printf ">>> Success: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
   fi
 }
 
 call() {
-  printf ">>>> Run: \"$1\" ^ Called from function: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
+  printf ">>> Run: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
   $1
-  printf ">>>> Success: \"$1\"\n"
+  printf ">>> Success: \"$1\" ^ Called from: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
 }
 
 exists() {
@@ -38,7 +40,7 @@ exists() {
 }
 
 die() {
-  printf ">>>> Error: ${1} in function: ${FUNCNAME[ 1 ]} < ${FUNCNAME[ 2 ]} < ${FUNCNAME[ 3 ]} < ${FUNCNAME[ 4 ]} \n\a"
+  printf ">>> Error: ${1} in function: ${FUNCNAME[ 1 ]} < ${FUNCNAME[ 2 ]} < ${FUNCNAME[ 3 ]} < ${FUNCNAME[ 4 ]} \n\a"
   exit 1
 }
 

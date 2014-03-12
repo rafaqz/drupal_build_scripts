@@ -4,8 +4,6 @@
 SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 source "$SCRIPT_DIR/utils.sh"
 
-declare -A completed_funcs
-
 install() {
   action="install"
   confirm "About to install the $PROJECT_NAME project and overwrite the $new_instance_name database and code" 
@@ -72,7 +70,7 @@ make() {
   if cd $new_instance_dir; then
     echo "build dir allredy exists, drush make skipped."
   else
-    run "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $BUILD_TYPE $OUPUT"
+    run "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUPUT $BUILD_TYPE"
   fi
 }
 
@@ -107,7 +105,7 @@ get_new_instance() {
     update|rollforward )
       dep get_current_instance
       new_instance_num=$[$current_instance_num+1]
-      # Limit number of instances, set back to start when larger than $PROJECT_INSTANCES.
+      # Limit number of instances, set back to 1 when larger than $PROJECT_INSTANCES.
       if [ $new_instance_num -gt $PROJECT_INSTANCES ]; then 
         new_instance_num=1
       fi
@@ -269,7 +267,7 @@ build_drush_aliases() {
 
 check_drush_aliases() {
   drush cc drush
-  last_alias="@"$PROJECT_NAME".local"$PROJECT_INSTANCES
+  last_alias=$PROJECT_NAME".local"$PROJECT_INSTANCES
   if ! [[ "$(drush sa | grep $last_alias)" == $last_alias ]]  ; then
     die "Drush aliases are not available"
   else
