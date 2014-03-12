@@ -10,15 +10,14 @@ install() {
   action="install"
   confirm "About to install the $PROJECT_NAME project and overwrite the $new_instance_name database and code" 
   dep make_files_dirs
-  call set_permissions
   call build
   call symlink_live
 }
 
 update() {
   action="update"
-  dep check_current_instance_vars
-  dep check_new_instance_vars
+  dep get_current_instance
+  dep get_new_instance
   confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
   call build
   call sync
@@ -29,16 +28,16 @@ update() {
 # The build script...
 rollback() {
   action="rollback"
-  dep check_current_instance_vars
-  dep check_new_instance_vars
+  dep get_current_instance
+  dep get_new_instance
   confirm "About to roll back from $current_instance_name to the last installed instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
   call symlink_live
 }
 
 rollforward() {
   action="rollforward"
-  dep check_current_instance_vars
-  dep check_new_instance_vars
+  dep get_current_instance
+  dep get_new_instance
   confirm "About to rollforward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
   call symlink_live
 }
@@ -84,7 +83,8 @@ sync() {
 }
 
 clear_new_instance_dir() {
-  # Ok if this dosn't work.
+  dep get_new_instance
+  # Ok if this dosn't exist and rm dosn't work.
   sudo rm -r $new_instance_dir
 }
 
@@ -95,6 +95,7 @@ get_current_instance() {
   current_instance_num=$(drush sql-connect --root=$LIVE_SYMLINK_DIR | awk -F"--database=" '{print $2}' | awk '{print $1}' | tr -dc '[0-9]')
   current_instance_name=$PROJECT_NAME$current_instance_num
   current_instance_dir="$CODE_DIR/$current_instance_name"
+  call check_current_instance_vars
   echo "Current instance: $current_instance_name"
 }
 
@@ -104,7 +105,7 @@ get_new_instance() {
       new_instance_num="1"
       ;;
     update|rollforward )
-      dep check_current_instance_vars
+      dep get_current_instance
       new_instance_num=$[$current_instance_num+1]
       # Limit number of instances, set back to start when larger than $PROJECT_INSTANCES.
       if [ $new_instance_num -gt $PROJECT_INSTANCES ]; then 
@@ -112,7 +113,7 @@ get_new_instance() {
       fi
       ;;
     rollback )
-      dep check_current_instance_vars
+      dep get_current_instance
       new_instance_num=$[$current_instance_num-1]
       # Cycle back through instances, set to $PROJECT_INSTANCES when less than 1.
       if [ $new_instance_num -lt 1 ]; then 
@@ -121,7 +122,7 @@ get_new_instance() {
       ;;
     * )
       # A function has been called directly, use the current instance.
-      dep check_current_instance_vars
+      dep get_current_instance
       new_instance_num=$current_instance_num
   esac
   new_instance_name=$PROJECT_NAME$new_instance_num
@@ -191,31 +192,30 @@ make_files_dirs() {
 }
 
 check_current_instance_dir() {
-  dep check_current_instance_vars
+  dep get_current_instance
   check_dir $current_instance_dir
   echo $current_instance_dir
 }
 
 check_new_instance_dir() {
-  dep check_new_instance_vars
+  dep get_new_instance
   check_dir $new_instance_dir
 }
 
 set_current_alias() {
-  dep check_current_instance_vars
+  dep get_current_instance
   dep build_drush_aliases
   current_alias="@"$PROJECT_NAME".local"$current_instance_num
   echo $current_alias
 }
 
 set_new_alias() {
-  dep check_new_instance_vars
+  dep get_new_instance
   dep build_drush_aliases
   new_alias="@"$PROJECT_NAME".local"$new_instance_num 
 }
 
 check_new_instance_vars() {
-  dep get_new_instance
   if [[ -z "$new_instance_dir" ]]; then
     die "No new instance directory available"
   fi
@@ -228,7 +228,6 @@ check_new_instance_vars() {
 }
 
 check_current_instance_vars() {
-  dep get_current_instance
   if [[ -z "$current_instance_dir" ]]; then
     echo "dir: $current_instance_dir"
     die "No current instance directory available"
@@ -244,6 +243,11 @@ check_current_instance_vars() {
 check_project_dir() {
   check_dir $PROJECT_DIR
 }
+
+check_code_dir() {
+  check_dir $CODE_DIR
+}
+
 
 build_drush_aliases() {
   check_dir $DRUSH_ALIAS_DIR

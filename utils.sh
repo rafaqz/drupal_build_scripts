@@ -11,30 +11,26 @@ run() {
   fi
 }
 
-completed() {
-  func=${FUNCNAME[ 1 ]}
-  completed_funcs[$func]=TRUE;
-  echo $func
-}
-
 dep() {
   # Print function names
-  printf "**** Dep: \"$1\"\t\t\tCalled from function: \"${FUNCNAME[ 1 ]}\"\n"
+  printf "**** Dep: \"$1\" ^ Called from function: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
   if ! exists $1 in completed_funcs; then
-    printf ">>>> Run: \"$1\"\t\t\tCalled from function: \"${FUNCNAME[ 1 ]}\"\n"
+    printf ">>>> Run: \"$1\" ^ Called from function: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
     $1
     completed_funcs[$1]=TRUE;
+    printf ">>>> Success: \"$1\"\n"
   fi
 }
 
 call() {
-  printf ">>>> Run: \"$1\"\t\t\tCalled from function: \"${FUNCNAME[ 1 ]}\"\n"
+  printf ">>>> Run: \"$1\" ^ Called from function: \"${FUNCNAME[ 1 ]}\"" | column -c 2 -t -s "^"
   $1
+  printf ">>>> Success: \"$1\"\n"
 }
 
 exists() {
   if [ "$2" != in ]; then
-    echo "Incorrect usage."
+    printf "Incorrect usage of \"exists()\"\n"
     echo "Correct usage: exists {key} in {array}"
     return
   fi   
@@ -42,7 +38,7 @@ exists() {
 }
 
 die() {
-  echo "${1}"
+  printf ">>>> Error: ${1} in function: ${FUNCNAME[ 1 ]} < ${FUNCNAME[ 2 ]} < ${FUNCNAME[ 3 ]} < ${FUNCNAME[ 4 ]} \n\a"
   exit 1
 }
 
@@ -60,7 +56,7 @@ confirm() {
   echo "${1}"
   # Check if this is for reals.
   while true; do
-    read -p "Please confirm (yes or no) y/n" yn
+    read -p "Please confirm (yes or no) y/n " yn
     case $yn in
       [Yy]* ) break;;
       [Nn]* ) exit;;

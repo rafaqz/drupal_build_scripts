@@ -49,6 +49,7 @@ $aliases['local'] = array(
         field_data_field_mf_subscription_type
         field_data_field_node_groups_ref
         field_data_field_node_ref
+        field_data_field_og_membership_ref
         field_data_field_organisation
         field_data_field_organisation_address
         field_data_field_organisation_image
@@ -87,6 +88,7 @@ $aliases['local'] = array(
         field_revision_field_mf_subscription_type
         field_revision_field_node_groups_ref
         field_revision_field_node_ref
+        field_revision_field_og_membership_ref
         field_revision_field_organisation
         field_revision_field_organisation_address
         field_revision_field_organisation_image
