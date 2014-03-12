@@ -31,7 +31,7 @@ call() {
 }
 
 debug() {
-  printf ">>> $1: \"$2\" \t\t Called from: \"$3\"\n"
+  printf "%-50s %s\n" ">>> $1: \"$2\""  "Called from: \"$3\""
 }
 
 exists() {
