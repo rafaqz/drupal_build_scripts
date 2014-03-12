@@ -127,10 +127,10 @@ $aliases['local'] = array(
         payment
         payment_line_item
         payment_method
-        payment_paypal_method
-        payment_paypal_payment
         payment_status_item
         paymentmethodbasic
+        paypal_payment_ec_payment
+        paypal_payment_ec_payment_method
         profile
         queue
         realname
