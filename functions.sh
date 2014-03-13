@@ -16,22 +16,27 @@ update() {
   action="update"
   dep get_current_instance
   dep get_new_instance
-  confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
+  #  Handle potential update after a rollback.
+  if test "$new_instance_dir/index.php" -nt "$current_instance_dir/index.php" 
+  then
+    confirm "WARNING: About to update from $current_instance_name and overwrite the newer instance $new_instance_name, probably after using rollback"
+  else
+    confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
+  fi
   call build
   call sync
   call cache_clear
   call symlink_live
 }
 
-# The build script...
 rollback() {
   action="rollback"
   dep get_current_instance
   dep get_new_instance
-  echo "$new_instance_dir/index.php"
+  #  Check the next instance is actually older than the current one.
   if test "$new_instance_dir/index.php" -ot "$current_instance_dir/index.php" 
   then
-    confirm "About to roll back from $current_instance_name to the last installed instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+    confirm "About to roll back from $current_instance_name to the older instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
   else
     die "There are no older instances to roll back to"
   fi
@@ -42,12 +47,12 @@ rollforward() {
   action="rollforward"
   dep get_current_instance
   dep get_new_instance
-  echo "$new_instance_dir/index.php"
+  #  Check the next instance is actually newer than the current one.
   if test "$new_instance_dir/index.php" -nt "$current_instance_dir/index.php" 
   then
     confirm "About to roll forward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
   else
-    die "There are no new instances to roll forward to"
+    die "There are no newer instances to roll forward to"
   fi
   call symlink_live
 }
@@ -101,7 +106,6 @@ clear_new_instance_dir() {
 }
 
 get_current_instance() {
-  #### Find current insance variables. ####
   # Get suffix number of current live database name, the first WORD after '--database=' in drush sql-connect output.
   echo "Getting instance from drush..."
   current_instance_num=$(drush sql-connect --root=$LIVE_SYMLINK_DIR | awk -F"--database=" '{print $2}' | awk '{print $1}' | tr -dc '[0-9]')
@@ -188,6 +192,15 @@ set_permissions() {
 
   set_dir_permissions $PERMANENT_FILES_DIR 770
   set_file_permissions $PERMANENT_FILES_DIR 660
+
+  # Allow write in features directories in dev builds.
+  if [ $BUILD_TYPE == $DEV ]; then
+    set_dir_permissions $new_instance_dir/profiles/$PROFILE/modules/features 750
+    set_file_permissions $new_instance_dir/projects/$PROFILE/modules/features 640
+    set_dir_permissions $new_instance_dir/sites/all/modules/features 750
+    set_file_permissions $new_instance_dir/sites/all/modules/features 640
+  fi
+
 }
 
 link_files_dirs() {
@@ -216,15 +229,15 @@ check_new_instance_dir() {
 }
 
 set_current_alias() {
-  dep get_current_instance
   dep build_drush_aliases
+  dep get_current_instance
   current_alias="@"$PROJECT_NAME".local"$current_instance_num
   echo $current_alias
 }
 
 set_new_alias() {
-  dep get_new_instance
   dep build_drush_aliases
+  dep get_new_instance
   new_alias="@"$PROJECT_NAME".local"$new_instance_num 
 }
 

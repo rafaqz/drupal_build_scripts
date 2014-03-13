@@ -73,10 +73,10 @@ confirm() {
 
 set_dir_permissions() {
   printf "Changing permissions of all directories inside \"${1}\" to \"${2}\"...\n"
-  run "find ${1} -type d -exec chmod ${2} '{}' \;"
+  find ${1} -type d -exec chmod ${2} '{}' \;
 }
 
 set_file_permissions() {
   printf "Changing permissions of all files inside \"${1}\" to \"${2}\"...\n"
-  run "find ${1} -type f -exec chmod ${2} '{}' \;"
+  find ${1} -type f -exec chmod ${2} '{}' \;
 }
