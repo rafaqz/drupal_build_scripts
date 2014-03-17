@@ -29,6 +29,10 @@ MAKE_FILE=''
 # Set the theme (should possibly remove this)
 THEME='' 
 
+# URL of list of modules enabled file, containing module names separated by spaces and/or commas.
+MODULE_ENABLED_LIST='https://raw.github.com/rafaqz/off_make/master/off_modules_enabled.txt'
+# URL of list of skip tables file, containing table names separated by spaces and/or commas.
+SKIP_TABLES_LIST='https://raw.github.com/rafaqz/off_make/master/skip_tables.txt'
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'
