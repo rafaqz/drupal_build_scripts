@@ -1,8 +1,9 @@
 #!/bin/bash
 
-declare -A completed_funcs
+declare -A completed_deps
 
 run() {
+  debug "Run" $1 ${FUNCNAME[ 1 ]}
   if pushd "${2}" > /dev/null; then
     if ! eval ${1}; then
       die "Command ${1} failed in directory ${2}!";
@@ -14,18 +15,27 @@ run() {
 }
 
 dep() {
-  # Print function names
+  # Respects dependencies.
   debug "Dep" $1 ${FUNCNAME[ 1 ]}
-  if ! exists $1 in completed_funcs; then
-    debug "Run" $1 ${FUNCNAME[ 1 ]}
+  if ! exists $1 in completed_deps; then
+    debug "Call" $1 ${FUNCNAME[ 1 ]}
     $1
-    completed_funcs[$1]=TRUE;
+    completed_deps[$1]=TRUE;
     debug "Success" $1 ${FUNCNAME[ 1 ]}
   fi
 }
 
+reset() {
+  # Allways runs but sets completed deps.
+  debug "Reset" $1 ${FUNCNAME[ 1 ]}
+  $1
+  completed_deps[$1]=TRUE;
+  debug "Success" $1 ${FUNCNAME[ 1 ]}
+}
+
 call() {
-  debug "Run" $1 ${FUNCNAME[ 1 ]}
+  # Ignores dependencies .
+  debug "Call" $1 ${FUNCNAME[ 1 ]}
   $1
   debug "Success" $1 ${FUNCNAME[ 1 ]}
 }
