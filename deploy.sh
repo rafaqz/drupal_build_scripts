@@ -6,6 +6,10 @@ source "$SCRIPT_DIR/config.sh"
 source "$SCRIPT_DIR/functions.sh"
 
 # Run supplied command.
-printf ">>> Run \"$@\" ^ Called from shell" | column -c 2 -t -s "^"
-    debug "Run" $@ "shell" 
-eval "$@"
+for var in "$@"
+do
+  debug "Run" $var "shell" 
+  eval $var
+done
+
+
