@@ -332,11 +332,10 @@ build_drush_aliases() {
   check_dir $DRUSH_ALIAS_DIR
   alias_file=$DRUSH_ALIAS_DIR"/"$PROJECT_NAME".aliases.drushrc.php"
   # If this fails we'll use the existing skip tables file or copy the whole database.
-  #run "wget -N -O $new_instance_dir/skip_tables.txt $SKIP_TABLES_LIST"
-  #skip_tables=$(<"$new_instance_dir/skip_tables.txt")
-  skip_tables=$(<~/Projects/off/make/skip_tables.txt)
+  run "wget -N -O $new_instance_dir/skip_tables.txt $SKIP_TABLES_LIST"
+  skip_tables=$(<"$new_instance_dir/skip_tables.txt")
 
-  # What follows some damn ugly template string replacement. Enjoy.
+  # What follows is some damn ugly template string replacement. Enjoy.
   template_file=$SCRIPT_DIR/aliases.drushrc.php
   template=$(<$template_file)
   echo "**** DRUSH ALIAS TEMPLATE: $template"
