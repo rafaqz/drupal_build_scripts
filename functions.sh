@@ -7,15 +7,14 @@ source "$SCRIPT_DIR/utils.sh"
 install() {
   action="install"
   confirm "About to install the $PROJECT_NAME project and overwrite the $new_instance_name database and code" 
-  dep make_files_dirs
+  dep make_dirs
   call build
-  call symlink_live
+  call setup
+  call live
 }
 
 update() {
   action="update"
-  dep get_current_instance
-  dep get_new_instance
   #  Handle potential update after a rollback.
   if test "$new_instance_dir/index.php" -nt "$current_instance_dir/index.php" 
   then
@@ -24,9 +23,36 @@ update() {
     confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
   fi
   call build
+  call setup
   call sync
+  call fix_ids
   call cache_clear
-  call symlink_live
+  call live
+}
+
+# Action utilities.
+# inc, dec, and cur are utilities to set the new target instance. they do nothing
+# on their own, so should be followed with another command. 
+# Eg. "bash deploy.sh inc live" will symlink to the next instance without asking questions.
+inc() {
+  # This is rollforward without context checks for command line tweaking.
+  action="inc"
+  reset get_current_instance
+  reset get_new_instance
+}
+
+dec() {
+  # This is rollback without context checks for command line tweaking.
+  action="dec"
+  reset get_current_instance
+  reset get_new_instance
+}
+
+cur() {
+  # This will reset the action to use the current instance.
+  action="cur"
+  reset get_current_instance
+  reset get_new_instance
 }
 
 rollback() {
@@ -40,7 +66,7 @@ rollback() {
   else
     die "There are no older instances to roll back to"
   fi
-  call symlink_live
+  call live
 }
 
 rollforward() {
@@ -54,9 +80,8 @@ rollforward() {
   else
     die "There are no newer instances to roll forward to"
   fi
-  call symlink_live
+  call live
 }
-
 
 build() {
   dep check_project_dir
@@ -64,6 +89,9 @@ build() {
   dep make
   dep site_install
   call set_permissions
+}
+
+setup() {
   # Enable site theme before features are reverted.
   call set_theme
   # Revert core features so all fields etc are available for dependencies without errors.
@@ -96,7 +124,31 @@ make() {
 sync() {
   dep set_current_alias
   dep set_new_alias
-  run "drush sql-sync $current_alias $new_alias --yes $OUTPUT"
+  run "drush sql-sync $current_alias $new_alias --yes $OUTPUT --skip-tables-list=$skip_tables"
+}
+
+fix_ids() {
+  # Fixe ids in tables that use only id without a machine name.
+  dep set_new_alias
+  drush $new_alias php-eval "db_query('Update ${new_instance_name}.taxonomy_term_data td1 
+  INNER JOIN ${current_instance_name}.taxonomy_vocabulary v2 ON v2.vid = td1.vid 
+  INNER JOIN ${new_instance_name}.taxonomy_vocabulary v1 ON v1.machine_name = v2.machine_name 
+  Set td1.vid = v1.vid;
+
+  Update ${new_instance_name}.flagging fg1 
+  INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fg1.fid 
+  INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
+  Set fg1.fid = f1.fid;
+
+  Update ${new_instance_name}.flag_types ft1 
+  INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = ft1.fid 
+  INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
+  Set ft1.fid = f1.fid;
+
+  Update ${new_instance_name}.flag_counts fc1 
+  INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc1.fid 
+  INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
+  Set fc1.fid = f1.fid;')" $OUTPUT
 }
 
 clear_new_instance_dir() {
@@ -120,15 +172,15 @@ get_new_instance() {
     install )
       new_instance_num="1"
       ;;
-    update|rollforward )
+    update|rollforward|inc )
       dep get_current_instance
       new_instance_num=$[$current_instance_num+1]
       # Limit number of instances, set back to 1 when larger than $PROJECT_INSTANCES.
       if [ $new_instance_num -gt $PROJECT_INSTANCES ]; then 
-        new_instance_num=1
+        new_instance_num="1"
       fi
       ;;
-    rollback )
+    rollback|dec )
       dep get_current_instance
       new_instance_num=$[$current_instance_num-1]
       # Cycle back through instances, set to $PROJECT_INSTANCES when less than 1.
@@ -168,10 +220,10 @@ enable_modules() {
   # This allows adding features not in the core profile.
   dep check_new_instance_dir
   run "wget -N -O $new_instance_dir/enabled.txt $MODULE_ENABLED_LIST"
-  run "drush pm-enable $(cat $new_instance_dir/enabled.txt) --root=$new_instance_dir $OUTPUT --yes"
+  run "drush pm-enable $(<"$new_instance_dir/enabled.txt") --root=$new_instance_dir $OUTPUT --yes"
 }
 
-symlink_live() {
+live() {
   dep check_new_instance_dir
   # Create symlink to drupal dir for apache etc.
   run "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
@@ -209,7 +261,7 @@ link_files_dirs() {
   run "ln -sf $FILES_DIR $new_instance_dir/$DRUPAL_FILES_DIR -v"
 }
     
-make_files_dirs() {
+make_dirs() {
   echo "Making all directoris required for the build and future updates"
   run "mkdir $PERMANENT_FILES_DIR -v"
   run "mkdir $FILES_DIR -v"
@@ -274,10 +326,15 @@ check_code_dir() {
   check_dir $CODE_DIR
 }
 
-
 build_drush_aliases() {
+  dep get_new_instance
+  dep check_new_instance_dir
   check_dir $DRUSH_ALIAS_DIR
   alias_file=$DRUSH_ALIAS_DIR"/"$PROJECT_NAME".aliases.drushrc.php"
+  # If this fails we'll use the existing skip tables file or copy the whole database.
+  #run "wget -N -O $new_instance_dir/skip_tables.txt $SKIP_TABLES_LIST"
+  #skip_tables=$(<"$new_instance_dir/skip_tables.txt")
+  skip_tables=$(<~/Projects/off/make/skip_tables.txt)
 
   # What follows some damn ugly template string replacement. Enjoy.
   template_file=$SCRIPT_DIR/aliases.drushrc.php
@@ -288,6 +345,7 @@ build_drush_aliases() {
   template=${template//"{{project_code_dir}}"/$CODE_DIR}
   template=${template//"{{root}}"/$LIVE_SYMLINK_DIR}
   template=${template//"{{uri}}"/$LIVE_URI}
+  template=${template//"{{skip_tables}}"/$skip_tables}
   echo "**** SUBSTITUTED DRUSH ALIAS TEMPLATE: $template"
   echo "$template" > $alias_file
   call check_drush_aliases
