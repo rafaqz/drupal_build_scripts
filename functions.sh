@@ -135,20 +135,23 @@ fix_ids() {
   INNER JOIN ${new_instance_name}.taxonomy_vocabulary v1 ON v1.machine_name = v2.machine_name 
   Set td1.vid = v1.vid;
 
-  Update ${new_instance_name}.flagging fg1 
+  UPDATE ${new_instance_name}.flagging fg1 
   INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fg1.fid 
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
   Set fg1.fid = f1.fid;
 
-  Update ${new_instance_name}.flag_types ft1 
+  UPDATE ${new_instance_name}.flag_types ft1 
   INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = ft1.fid 
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
   Set ft1.fid = f1.fid;
 
-  Update ${new_instance_name}.flag_counts fc1 
+  UPDATE ${new_instance_name}.flag_counts fc1 
   INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc1.fid 
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
-  Set fc1.fid = f1.fid;')" $OUTPUT
+  Set fc1.fid = f1.fid;
+
+  INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links WHERE menu_name LIKE \"book%\";
+  ')" $OUTPUT
 }
 
 clear_new_instance_dir() {
