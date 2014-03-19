@@ -30,9 +30,9 @@ MAKE_FILE=''
 THEME='' 
 
 # URL of list of modules enabled file, containing module names separated by spaces and/or commas.
-MODULE_ENABLED_LIST='https://raw.github.com/rafaqz/off_make/master/off_modules_enabled.txt'
+MODULE_ENABLED_LIST=''
 # URL of list of skip tables file, containing table names separated by spaces and/or commas.
-SKIP_TABLES_LIST='https://raw.github.com/rafaqz/off_make/master/skip_tables.txt'
+SKIP_TABLES_LIST=''
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'
