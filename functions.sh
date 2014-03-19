@@ -25,7 +25,7 @@ update() {
   call build
   call setup
   call sync
-  call fix_ids
+  call repair_tables
   call cache_clear
   call live
 }
@@ -127,10 +127,10 @@ sync() {
   run "drush sql-sync $current_alias $new_alias --yes $OUTPUT --skip-tables-list=$skip_tables"
 }
 
-fix_ids() {
+repair_tables() {
   # Fixe ids in tables that use only id without a machine name.
   dep set_new_alias
-  drush $new_alias php-eval "db_query(\"Update ${new_instance_name}.taxonomy_term_data td1 
+  drush $new_alias $OUTPUT sql-query "Update ${new_instance_name}.taxonomy_term_data td1 
   INNER JOIN ${current_instance_name}.taxonomy_vocabulary v2 ON v2.vid = td1.vid 
   INNER JOIN ${new_instance_name}.taxonomy_vocabulary v1 ON v1.machine_name = v2.machine_name 
   Set td1.vid = v1.vid;
@@ -150,8 +150,8 @@ fix_ids() {
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
   Set fc1.fid = f1.fid;
 
-  INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.menu_name LIKE book%; 
-  \")" $OUTPUT
+  INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.module = \"book\"; 
+  " 
 }
 
 clear_new_instance_dir() {
