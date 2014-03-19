@@ -149,8 +149,6 @@ repair_tables() {
   INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc1.fid 
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
   Set fc1.fid = f1.fid;
-
-  INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.module = \"book\"; 
   " 
 }
 
