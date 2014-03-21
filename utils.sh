@@ -69,7 +69,9 @@ check_dir() {
 }
 
 confirm() {
-  echo "${1}"
+  if [ "$CONFIRMATION" = "y" ]; then
+    return
+  fi
   # Check if this is for reals.
   while true; do
     read -p "Please confirm (yes or no) y/n " yn
