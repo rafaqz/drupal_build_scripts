@@ -9,6 +9,7 @@ install() {
   confirm "About to install the $PROJECT_NAME project and overwrite the $new_instance_name database and code" 
   dep make_dirs
   call build
+  dep build_drush_aliases
   call setup
   call live
 }
@@ -22,10 +23,12 @@ update() {
   else
     confirm "About to update the $PROJECT_NAME project and overwrite the $new_instance_name database and code"
   fi
+  dep build_drush_aliases
   call build
   call setup
   call sync
   call repair_tables
+  call copy_variables
   call cache_clear
   call live
 }
@@ -125,6 +128,16 @@ sync() {
   dep set_current_alias
   dep set_new_alias
   run "drush sql-sync $current_alias $new_alias --yes $OUTPUT --skip-tables-list=$skip_tables"
+}
+
+copy_variables() {
+  # Fixe ids in tables that use only id without a machine name.
+  dep set_new_alias
+  variables=$(wget -qO- $VARIABLE_LIST)
+  for variable in ${variables[@]} 
+  do
+    drush $new_alias $OUTPUT sql-query "INSERT INTO ${new_instance_name}.variable SELECT * FROM ${current_instance_name}.variable v2 WHERE v2.name = \"$variable\" ON DUPLICATE KEY UPDATE value = v2.value;"
+  done
 }
 
 repair_tables() {
@@ -285,14 +298,14 @@ check_new_instance_dir() {
 }
 
 set_current_alias() {
-  dep build_drush_aliases
+  dep check_drush_aliases
   dep get_current_instance
   current_alias="@"$PROJECT_NAME".local"$current_instance_num
   echo $current_alias
 }
 
 set_new_alias() {
-  dep build_drush_aliases
+  dep check_drush_aliases
   dep get_new_instance
   new_alias="@"$PROJECT_NAME".local"$new_instance_num 
 }
