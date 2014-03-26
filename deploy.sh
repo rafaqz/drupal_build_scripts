@@ -7,14 +7,19 @@ source "$SCRIPT_DIR/functions.sh"
 
 usage() { echo "Usage: $0 [-dp] [command1] [command2] ... [commandN]
   -y - yes to all confirmations
-  -d - debug output" 1>&2; exit 1; }
+  -v - verbose output mode
+  " 1>&2; exit 1; 
+}
 
-while getopts ":y:d:" o; do
+while getopts ":yvq" o; do
   case "${o}" in
     y)
-     CONFIRMATION="y" 
+      CONFIRMATION="y" 
       ;;
-    d)
+    q)
+      QUIET="y" 
+      ;;
+    v)
       OUTPUT=$DEBUG
       ;;
     *)
@@ -23,7 +28,7 @@ while getopts ":y:d:" o; do
   esac
 done
 
-# Run supplied command.
+# Run supplied commands.
 for var in "$@"
 do
   debug "Run" $var "shell" 

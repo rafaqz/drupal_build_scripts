@@ -41,7 +41,16 @@ call() {
 }
 
 debug() {
-  printf "%-50s %s\n" ">>> $1: \"$2\""  "Called from: \"$3\""
+  if [ "$OUTPUT" == "$DEBUG" ] ; then
+    # Print arguments and function parent in columns
+    printf "%-50s %s\n" ">>> $1: \"$2\""  "Called from: \"$3\""
+  fi
+}
+
+message() {
+  if [ "$QUIET" != "y" ] ; then
+    echo "$1"
+  fi
 }
 
 exists() {

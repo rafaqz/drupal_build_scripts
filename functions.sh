@@ -111,14 +111,14 @@ site_install() {
   dep check_project_dir
   dep check_new_instance_dir
   dep link_files_dirs
-  echo "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
+  message "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
   drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUPUT --root=$new_instance_dir
 }
 
 make() {
   dep get_new_instance
   if cd $new_instance_dir; then
-    echo "build dir allredy exists, drush make skipped."
+    message "build dir allredy exists, drush make skipped."
   else
     run "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUPUT $BUILD_TYPE"
   fi
@@ -176,12 +176,12 @@ clear_new_instance_dir() {
 
 get_current_instance() {
   # Get suffix number of current live database name, the first WORD after '--database=' in drush sql-connect output.
-  echo "Getting instance from drush..."
+  message "Getting instance from drush..."
   current_instance_num=$(drush sql-connect --root=$LIVE_SYMLINK_DIR | awk -F"--database=" '{print $2}' | awk '{print $1}' | tr -dc '[0-9]')
   current_instance_name=$PROJECT_NAME$current_instance_num
   current_instance_dir="$CODE_DIR/$current_instance_name"
   call check_current_instance_vars
-  echo "Current instance: $current_instance_name"
+  message "Current instance: $current_instance_name"
 }
 
 get_new_instance() {
@@ -212,7 +212,7 @@ get_new_instance() {
   esac
   new_instance_name=$PROJECT_NAME$new_instance_num
   new_instance_dir="$CODE_DIR/$new_instance_name"
-  echo "New instance: $new_instance_name"
+  message "New instance: $new_instance_name"
 }
 
 set_theme() {
@@ -250,7 +250,6 @@ set_permissions() {
   dep check_new_instance_dir
   dep check_user
   
-  sudo echo "Need sudo to set file permissions."
   # Set ownership of all files and directories.
   printf "Changing ownership of all contents of \"${PROJECT_DIR}\":\nuser => \"${USER}\" \t group => \"${GROUP}\"\n"
   run "sudo chown -R $USER:$GROUP $PROJECT_DIR"
@@ -279,7 +278,7 @@ link_files_dirs() {
 }
     
 make_dirs() {
-  echo "Making all directoris required for the build and future updates"
+  message "Making all directoris required for the build and future updates"
   run "mkdir $PERMANENT_FILES_DIR -v"
   run "mkdir $FILES_DIR -v"
   run "mkdir $PRIVATE_FILES_DIR -v"
@@ -289,7 +288,7 @@ make_dirs() {
 check_current_instance_dir() {
   dep get_current_instance
   check_dir $current_instance_dir
-  echo $current_instance_dir
+  message $current_instance_dir
 }
 
 check_new_instance_dir() {
@@ -301,7 +300,7 @@ set_current_alias() {
   dep check_drush_aliases
   dep get_current_instance
   current_alias="@"$PROJECT_NAME".local"$current_instance_num
-  echo $current_alias
+  message $current_alias
 }
 
 set_new_alias() {
@@ -324,7 +323,7 @@ check_new_instance_vars() {
 
 check_current_instance_vars() {
   if [[ -z "$current_instance_dir" ]]; then
-    echo "dir: $current_instance_dir"
+    message "dir: $current_instance_dir"
     die "No current instance directory available"
   fi
   if [[ -z "$current_instance_name" ]]; then
@@ -356,15 +355,15 @@ build_drush_aliases() {
   # What follows is some damn ugly template string replacement. Enjoy.
   template_file=$SCRIPT_DIR/aliases.drushrc.php
   template=$(<$template_file)
-  echo "**** DRUSH ALIAS TEMPLATE: $template"
+  message "**** DRUSH ALIAS TEMPLATE: $template"
   template=${template//"{{project_instances}}"/$PROJECT_INSTANCES}
   template=${template//"{{project_name}}"/$PROJECT_NAME}
   template=${template//"{{project_code_dir}}"/$CODE_DIR}
   template=${template//"{{root}}"/$LIVE_SYMLINK_DIR}
   template=${template//"{{uri}}"/$LIVE_URI}
   template=${template//"{{skip_tables}}"/$skip_tables}
-  echo "**** SUBSTITUTED DRUSH ALIAS TEMPLATE: $template"
-  echo "$template" > $alias_file
+  message "**** SUBSTITUTED DRUSH ALIAS TEMPLATE: $template"
+  message "$template" > $alias_file
   call check_drush_aliases
 }
 
@@ -374,7 +373,7 @@ check_drush_aliases() {
   if ! [[ "$(drush sa | grep $last_alias)" == $last_alias ]]  ; then
     die "Drush aliases are not available"
   else
-    echo "Drush aliases are available"
+    message "Drush aliases are available"
   fi
 }
 
