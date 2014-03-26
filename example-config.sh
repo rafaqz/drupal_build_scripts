@@ -23,7 +23,7 @@ GROUP=''
 # Change the site name here. you can also change this easily after install.
 SITE_NAME=''
 # Set the site profile
-PROFILE='collabco'
+PROFILE=''
 # Make file location. Only change this if you know what you are doing.
 MAKE_FILE=''
 # Set the theme (should possibly remove this)
@@ -33,6 +33,8 @@ THEME=''
 MODULE_ENABLED_LIST=''
 # URL of list of skip tables file, containing table names separated by spaces and/or commas.
 SKIP_TABLES_LIST=''
+# URL of list of sync variables file, containing variable names, one per line.
+VARIABLE_LIST=''
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'
