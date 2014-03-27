@@ -12,6 +12,18 @@
  *
  */
 
+$aliases['prod'] = array(
+    'uri' => '{{prod_uir}}',
+    'root' => '{{prod_root}}',
+    'remote-host' => '{{prod_remote_host}}',
+    'remote-user' => '{{prod_remote_user}}',
+  );
+$aliases['stage'] = array(
+    'uri' => '{{stage_uir}}',
+    'root' => '{{stage_root}}',
+    'remote-host' => '{{stage_remote_host}}',
+    'remote-user' => '{{stage_remote_user}}',
+  );
 $aliases['local'] = array(
     'uri' => '{{uri}}',
     'root' => '{{root}}',

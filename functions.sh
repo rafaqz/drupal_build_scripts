@@ -344,13 +344,11 @@ check_code_dir() {
 
 build_drush_aliases() {
   dep get_new_instance
-  dep check_new_instance_dir
   check_dir $DRUSH_ALIAS_DIR
   alias_file=$DRUSH_ALIAS_DIR"/"$PROJECT_NAME".aliases.drushrc.php"
   # If this fails we'll use the existing skip tables file or copy the whole database.
-  run "wget -N -O $new_instance_dir/skip_tables.txt $SKIP_TABLES_LIST"
   # Replace newlines with commans and remove all spaces.
-  skip_tables=$(cat "$new_instance_dir/skip_tables.txt" | tr '\n' ',' | tr -d ' ')
+  skip_tables=$(wget -qO- $SKIP_TABLES_LIST | tr '\n' ',' | tr -d ' ')
 
   # What follows is some damn ugly template string replacement. Enjoy.
   template_file=$SCRIPT_DIR/aliases.drushrc.php
@@ -362,6 +360,14 @@ build_drush_aliases() {
   template=${template//"{{root}}"/$LIVE_SYMLINK_DIR}
   template=${template//"{{uri}}"/$LIVE_URI}
   template=${template//"{{skip_tables}}"/$skip_tables}
+  template=${template//"{{stage_remote_host}}"/$STAGE_REMOTE_HOST}
+  template=${template//"{{stage_remote_user}}"/$STAGE_REMOTE_USER}
+  template=${template//"{{stage_root}}"/$STAGE_ROOT}
+  template=${template//"{{stage_uir}}"/$STAGE_URI}
+  template=${template//"{{prod_remote_host}}"/$PROD_REMOTE_HOST}
+  template=${template//"{{prod_remote_user}}"/$PROD_REMOTE_USER}
+  template=${template//"{{prod_root}}"/$PROD_ROOT}
+  template=${template//"{{prod_uir}}"/$PROD_URI}
   message "**** SUBSTITUTED DRUSH ALIAS TEMPLATE: $template"
   message "$template" > $alias_file
   call check_drush_aliases
