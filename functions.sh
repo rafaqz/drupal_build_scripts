@@ -28,7 +28,7 @@ update() {
   call setup
   call sync
   call repair_tables
-  call copy_variables
+  call sync_variables
   call cache_clear
   call live
 }
@@ -130,7 +130,7 @@ sync() {
   run_cmd "drush sql-sync $current_alias $new_alias --yes $OUTPUT --skip-tables-list=$skip_tables"
 }
 
-copy_variables() {
+sync_variables() {
   # Fixe ids in tables that use only id without a machine name.
   dep set_new_alias
   variables=$(wget -qO- $VARIABLE_LIST)
