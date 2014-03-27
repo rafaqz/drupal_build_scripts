@@ -2,7 +2,7 @@
 
 declare -A completed_deps
 
-run() {
+run_cmd() {
   debug "Run" $1 ${FUNCNAME[ 1 ]}
   if pushd "${2}" > /dev/null; then
     if ! eval ${1}; then
@@ -78,7 +78,7 @@ check_dir() {
 }
 
 confirm() {
-  if [ "$CONFIRMATION" = "y" ]; then
+  if [ "$CONFIRMATION" == "y" ]; then
     return
   fi
   # Check if this is for reals.

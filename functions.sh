@@ -120,14 +120,14 @@ make() {
   if cd $new_instance_dir; then
     message "build dir allredy exists, drush make skipped."
   else
-    run "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUPUT $BUILD_TYPE"
+    run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUPUT $BUILD_TYPE"
   fi
 }
 
 sync() {
   dep set_current_alias
   dep set_new_alias
-  run "drush sql-sync $current_alias $new_alias --yes $OUTPUT --skip-tables-list=$skip_tables"
+  run_cmd "drush sql-sync $current_alias $new_alias --yes $OUTPUT --skip-tables-list=$skip_tables"
 }
 
 copy_variables() {
@@ -218,32 +218,32 @@ get_new_instance() {
 set_theme() {
   dep check_new_instance_dir
   # Enable and set the theme
-  run "drush pm-enable $THEME --yes $OUTPUT --root=$new_instance_dir"
-  run "drush variable-set theme_default $THEME $OUTPUT --root=$new_instance_dir"
+  run_cmd "drush pm-enable $THEME --yes $OUTPUT --root=$new_instance_dir"
+  run_cmd "drush variable-set theme_default $THEME $OUTPUT --root=$new_instance_dir"
 }
 
 revert() {
   dep check_new_instance_dir
-  run "drush features-revert-all --yes $OUPUT --root=$new_instance_dir"
+  run_cmd "drush features-revert-all --yes $OUPUT --root=$new_instance_dir"
 }
 
 cache_clear() {
   dep check_new_instance_dir
-  run "drush cache-clear all $OUTPUT --root=$new_instance_dir"
+  run_cmd "drush cache-clear all $OUTPUT --root=$new_instance_dir"
 }
 
 enable_modules() {
   # Get a list of all modules that should be enabled, and enable them. 
   # This allows adding features not in the core profile.
   dep check_new_instance_dir
-  run "wget -N -O $new_instance_dir/enabled.txt $MODULE_ENABLED_LIST"
-  run "drush pm-enable $(<"$new_instance_dir/enabled.txt") --root=$new_instance_dir $OUTPUT --yes"
+  run_cmd "wget -N -O $new_instance_dir/enabled.txt $MODULE_ENABLED_LIST"
+  run_cmd "drush pm-enable $(<"$new_instance_dir/enabled.txt") --root=$new_instance_dir $OUTPUT --yes"
 }
 
 live() {
   dep check_new_instance_dir
   # Create symlink to drupal dir for apache etc.
-  run "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
+  run_cmd "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
 }
 
 set_permissions() {
@@ -252,8 +252,8 @@ set_permissions() {
   
   # Set ownership of all files and directories.
   printf "Changing ownership of all contents of \"${PROJECT_DIR}\":\nuser => \"${USER}\" \t group => \"${GROUP}\"\n"
-  run "sudo chown -R $USER:$GROUP $PROJECT_DIR"
-  run "sudo chmod 770 $PROJECT_DIR"
+  run_cmd "sudo chown -R $USER:$GROUP $PROJECT_DIR"
+  run_cmd "sudo chmod 770 $PROJECT_DIR"
 
   set_dir_permissions $new_instance_dir 750
   set_file_permissions $new_instance_dir 640
@@ -273,16 +273,16 @@ set_permissions() {
 
 link_files_dirs() {
   dep check_new_instance_dir
-  run "ln -sf $PRIVATE_FILES_DIR $new_instance_dir/$DRUPAL_PRIVATE_FILES_DIR -v"
-  run "ln -sf $FILES_DIR $new_instance_dir/$DRUPAL_FILES_DIR -v"
+  run_cmd "ln -sf $PRIVATE_FILES_DIR $new_instance_dir/$DRUPAL_PRIVATE_FILES_DIR -v"
+  run_cmd "ln -sf $FILES_DIR $new_instance_dir/$DRUPAL_FILES_DIR -v"
 }
     
 make_dirs() {
   message "Making all directoris required for the build and future updates"
-  run "mkdir $PERMANENT_FILES_DIR -v"
-  run "mkdir $FILES_DIR -v"
-  run "mkdir $PRIVATE_FILES_DIR -v"
-  run "mkdir $CODE_DIR -v"
+  run_cmd "mkdir $PERMANENT_FILES_DIR -v"
+  run_cmd "mkdir $FILES_DIR -v"
+  run_cmd "mkdir $PRIVATE_FILES_DIR -v"
+  run_cmd "mkdir $CODE_DIR -v"
 }
 
 check_current_instance_dir() {
@@ -393,4 +393,8 @@ check_user() {
   if [ -z "${USER}" ] || [ $(id -un ${USER} 2> /dev/null) != "${USER}" ]; then
     die "User $USER doesnt exist. Please provide a valid user."
   fi
+}
+
+set_maintence() {
+  drush $current_alias drush variable-set --always-set maintenance_mode $1 $OUTPUT
 }
