@@ -3,14 +3,9 @@
 declare -A completed_deps
 
 run_cmd() {
-  debug "Run" $1 ${FUNCNAME[ 1 ]}
-  if pushd "${2}" > /dev/null; then
-    if ! eval ${1}; then
-      die "Command ${1} failed in directory ${2}!";
-    fi
-    popd > /dev/null
-  else
-    die "Tried to run ${1} in ${2} but ${2} does not exist!";
+  debug "Run" "$1" ${FUNCNAME[ 1 ]}
+  if ! eval $1; then
+    die "Command "$1" failed!";
   fi
 }
 
