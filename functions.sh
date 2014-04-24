@@ -112,7 +112,7 @@ site_install() {
   dep check_new_instance_dir
   dep link_files_dirs
   message "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
-  drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUPUT --root=$new_instance_dir
+  drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir
 }
 
 make() {
@@ -120,7 +120,7 @@ make() {
   if cd $new_instance_dir; then
     message "build dir allredy exists, drush make skipped."
   else
-    run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUPUT $BUILD_TYPE"
+    run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUTPUT $BUILD_TYPE"
   fi
 }
 
@@ -143,6 +143,7 @@ sync_variables() {
 repair_tables() {
   # Fixe ids in tables that use only id without a machine name.
   dep set_new_alias
+  # TODO catch errors here.
   drush $new_alias $OUTPUT sql-query "Update ${new_instance_name}.taxonomy_term_data td1 
   INNER JOIN ${current_instance_name}.taxonomy_vocabulary v2 ON v2.vid = td1.vid 
   INNER JOIN ${new_instance_name}.taxonomy_vocabulary v1 ON v1.machine_name = v2.machine_name 
@@ -224,7 +225,7 @@ set_theme() {
 
 revert() {
   dep check_new_instance_dir
-  run_cmd "drush features-revert-all --yes $OUPUT --root=$new_instance_dir"
+  run_cmd "drush features-revert-all --yes $OUTPUT --root=$new_instance_dir"
 }
 
 cache_clear() {
