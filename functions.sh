@@ -266,6 +266,9 @@ set_permissions() {
   set_dir_permissions $new_instance_dir 750
   set_file_permissions $new_instance_dir 640
 
+  set_dir_permissions $new_instance_dir/cache 770
+  set_file_permissions $new_instance_dir/cache 660
+
   set_dir_permissions $PERMANENT_FILES_DIR 770
   set_file_permissions $PERMANENT_FILES_DIR 660
 
