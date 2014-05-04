@@ -104,6 +104,7 @@ customise() {
   # Revert all features.
   call revert
   call set_theme
+  dep add_settings
   call cache_clear
 }
 
@@ -141,6 +142,10 @@ sync_variables() {
   done
 }
 
+add_settings() {
+  settings=$(wget -qO- $EXTRA_SETTINGS)
+  cat >> $new_instance_dir/sites/default/settings.php <<< $settings
+}
 repair_tables() {
   # Fixe ids in tables that use only id without a machine name.
   dep set_new_alias

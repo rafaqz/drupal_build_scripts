@@ -35,6 +35,8 @@ MODULE_ENABLED_LIST=''
 SKIP_TABLES_LIST=''
 # URL of list of sync variables file, containing variable names, one per line.
 VARIABLE_LIST=''
+# URL of list of sync variables file, containing variable names, one per line.
+EXTRA_SETTINGS=''
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'
