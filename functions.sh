@@ -92,15 +92,17 @@ build() {
   dep make
   dep site_install
   call set_permissions
-}
-
-setup() {
   # Enable site theme before features are reverted.
   call set_theme
   # Revert core features so all fields etc are available for dependencies without errors.
   call revert
+}
+
+setup() {
   # Enable any extra modules or features.
   call enable_modules
+  # Some modules may have added new folders so set permissions again.
+  call set_permissions
   # Revert all features.
   call revert
   call set_theme
@@ -112,6 +114,7 @@ site_install() {
   dep check_new_instance_dir
   dep link_files_dirs
   message "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
+  #run_cmd "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:""'""$MYSQL_PASS""'""@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir"
   drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir
 }
 
@@ -265,9 +268,9 @@ set_permissions() {
   # Allow write in features directories in dev builds.
   if [ $BUILD_TYPE == $DEV ]; then
     set_dir_permissions $new_instance_dir/profiles/$PROFILE/modules/features 750
-    set_file_permissions $new_instance_dir/projects/$PROFILE/modules/features 640
+    set_file_permissions $new_instance_dir/projects/$PROFILE/modules/features 750
     set_dir_permissions $new_instance_dir/sites/all/modules/features 750
-    set_file_permissions $new_instance_dir/sites/all/modules/features 640
+    set_file_permissions $new_instance_dir/sites/all/modules/features 750
   fi
 
 }
