@@ -20,7 +20,7 @@ while getopts ":yvq" o; do
       QUIET="y" 
       ;;
     v)
-      OUTPUT=$DEBUG
+      #OUTPUT=$DEBUG
       ;;
     *)
       usage
@@ -33,6 +33,7 @@ for var in "$@"
 do
   debug "Run" $var "shell" 
   eval $var
+  debug "Success" $var "shell" 
 done
 
 
