@@ -13,13 +13,13 @@
  */
 
 $aliases['prod'] = array(
-    'uri' => '{{prod_uir}}',
+    'uri' => '{{prod_uri}}',
     'root' => '{{prod_root}}',
     'remote-host' => '{{prod_remote_host}}',
     'remote-user' => '{{prod_remote_user}}',
   );
 $aliases['stage'] = array(
-    'uri' => '{{stage_uir}}',
+    'uri' => '{{stage_uri}}',
     'root' => '{{stage_root}}',
     'remote-host' => '{{stage_remote_host}}',
     'remote-user' => '{{stage_remote_user}}',
