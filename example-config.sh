@@ -29,6 +29,18 @@ MAKE_FILE=''
 # Set the theme (should possibly remove this)
 THEME='' 
 
+# For drush aliases.
+DRUSH_ALIAS_DIR="/home/raf/.drush"
+PROD_ROOT=''
+PROD_URI=''
+PROD_REMOTE_HOST=''
+PROD_REMOTE_USER=''
+STAGE_ROOT=''
+STAGE_URI=''
+STAGE_REMOTE_HOST=''
+STAGE_REMOTE_USER=''
+
+
 # URL of list of modules enabled file, containing module names separated by spaces and/or commas.
 MODULE_ENABLED_LIST=''
 # URL of list of skip tables file, containing table names separated by spaces and/or commas.
