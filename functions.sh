@@ -63,12 +63,11 @@ rollback() {
   dep get_current_instance
   dep get_new_instance
   #  Check the next instance is actually older than the current one.
-  if test "$new_instance_dir/index.php" -ot "$current_instance_dir/index.php" 
-  then
-    confirm "About to roll back from $current_instance_name to the older instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
-  else
-    die "There are no older instances to roll back to"
-  fi
+  #if [[ "$new_instance_dir/index.php" -ot "$current_instance_dir/index.php" ]]; then
+    #confirm "About to roll back from $current_instance_name to the older instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  #else
+    #die "There are no older instances to roll back to"
+  #fi
   call live
 }
 
@@ -76,13 +75,12 @@ rollforward() {
   action="rollforward"
   dep get_current_instance
   dep get_new_instance
-  #  Check the next instance is actually newer than the current one.
-  if test "$new_instance_dir/index.php" -nt "$current_instance_dir/index.php" 
-  then
-    confirm "About to roll forward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
-  else
-    die "There are no newer instances to roll forward to"
-  fi
+  # Check the next instance is actually newer than the current one.
+  #if [[ "$new_instance_dir/index.php" -nt "$current_instance_dir/index.php" ]]; then
+    #confirm "About to roll forward from $current_instance_name to the newer instance $new_instance_name of $PROJECT_NAME, in $new_instance_dir"
+  #else
+    #die "There are no newer instances to roll forward to"
+  #fi
   call live
 }
 
