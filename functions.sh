@@ -144,8 +144,7 @@ sync_variables() {
 
 add_settings() {
   dep get_new_instance
-  settings=$(wget -qO- $EXTRA_SETTINGS)
-  cat >> $new_instance_dir/sites/default/settings.php <<< $settings
+  cat >> $new_instance_dir/sites/default/settings.php <<< $(wget -qO- $EXTRA_SETTINGS)
 }
 
 repair_tables() {
