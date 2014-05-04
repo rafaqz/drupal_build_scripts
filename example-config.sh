@@ -47,8 +47,8 @@ MODULE_ENABLED_LIST=''
 SKIP_TABLES_LIST=''
 # URL of list of sync variables file, containing variable names, one per line.
 VARIABLE_LIST=''
-# URL of list of sync variables file, containing variable names, one per line.
-EXTRA_SETTINGS=''
+# URL of file containing extra lines for settings.php.
+EXTRA_SETTINGS='https://raw.github.com/rafaqz/off_make/master/settings_php_extra.txt'
 
 # Build site with development repositories or just production files.
 DEV='--working-copy'
