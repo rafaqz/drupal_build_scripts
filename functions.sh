@@ -10,7 +10,7 @@ install() {
   dep make_dirs
   call build
   dep build_drush_aliases
-  call setup
+  call customise
   call live
 }
 
@@ -25,7 +25,7 @@ update() {
   fi
   dep build_drush_aliases
   call build
-  call setup
+  call customise
   call sync
   call repair_tables
   call sync_variables
@@ -98,7 +98,7 @@ build() {
   call revert
 }
 
-setup() {
+customise() {
   # Enable any extra modules or features.
   call enable_modules
   # Some modules may have added new folders so set permissions again.
