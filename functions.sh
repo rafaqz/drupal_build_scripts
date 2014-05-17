@@ -374,11 +374,11 @@ build_drush_aliases() {
   template=${template//"{{stage_remote_host}}"/$STAGE_REMOTE_HOST}
   template=${template//"{{stage_remote_user}}"/$STAGE_REMOTE_USER}
   template=${template//"{{stage_root}}"/$STAGE_ROOT}
-  template=${template//"{{stage_uir}}"/$STAGE_URI}
+  template=${template//"{{stage_uri}}"/$STAGE_URI}
   template=${template//"{{prod_remote_host}}"/$PROD_REMOTE_HOST}
   template=${template//"{{prod_remote_user}}"/$PROD_REMOTE_USER}
   template=${template//"{{prod_root}}"/$PROD_ROOT}
-  template=${template//"{{prod_uir}}"/$PROD_URI}
+  template=${template//"{{prod_uri}}"/$PROD_URI}
   message "**** SUBSTITUTED DRUSH ALIAS TEMPLATE: $template"
   message "$template" > $alias_file
   call check_drush_aliases
