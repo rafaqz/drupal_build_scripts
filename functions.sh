@@ -148,10 +148,11 @@ add_settings() {
 }
 
 repair_tables() {
-  # Fixe ids in tables that use only id without a machine name.
+  # Fix ids in tables that use only id without a machine name, and other wierd drupal things.
   dep set_new_alias
   # TODO catch errors here.
-  drush $new_alias $OUTPUT sql-query "Update ${new_instance_name}.taxonomy_term_data td1 
+  drush $new_alias $OUTPUT sql-query "
+  Update ${new_instance_name}.taxonomy_term_data td1 
   INNER JOIN ${current_instance_name}.taxonomy_vocabulary v2 ON v2.vid = td1.vid 
   INNER JOIN ${new_instance_name}.taxonomy_vocabulary v1 ON v1.machine_name = v2.machine_name 
   Set td1.vid = v1.vid;
@@ -173,6 +174,8 @@ repair_tables() {
 
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.module = \"book\"; 
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.menu_name = \"main-menu\" AND ml2.module = \"menu\"; 
+
+  UPDATE ${new_instance_name}.menu_links ml Set ml.hidden = 1 WHERE ml.menu_name = \"user-menu\" AND ml.link_path IN ('user/logout', 'user'); 
   " 
 }
 
