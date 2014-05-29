@@ -26,11 +26,13 @@ update() {
   dep build_drush_aliases
   call build
   call customise
+  set_maintenence 1
   call sync
   call repair_tables
   call sync_variables
   call cache_clear
   call live
+  set_maintenence 0
 }
 
 # Action utilities.
