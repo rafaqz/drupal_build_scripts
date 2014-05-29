@@ -175,8 +175,7 @@ repair_tables() {
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.module = \"book\"; 
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.menu_name = \"main-menu\" AND ml2.module = \"menu\"; 
 
-  UPDATE ${new_instance_name}.menu_links ml Set ml.hidden = 1 WHERE ml.menu_name = \"user-menu\" AND ml.link_path IN ('user/logout', 'user'); 
-  UPDATE `field_data_body` SET `body_format`=\"document\" WHERE `body_format`=\"wiki\"
+  UPDATE ${new_instance_name}.menu_links ml Set ml.hidden = 1 WHERE ml.menu_name = \"user-menu\" AND ml.link_path IN (\"user/logout\", \"user\"); 
   " 
 }
 
