@@ -4,6 +4,9 @@
 SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 source "$SCRIPT_DIR/utils.sh"
 
+#################################################################################
+# Actions 
+
 install() {
   action="install"
   confirm "About to install the $PROJECT_NAME project and overwrite the $new_instance_name database and code" 
@@ -35,31 +38,6 @@ update() {
   set_maintenence 0
 }
 
-# Action utilities.
-# inc, dec, and cur are utilities to set the new target instance. they do nothing
-# on their own, so should be followed with another command. 
-# Eg. "bash deploy.sh inc live" will symlink to the next instance without asking questions.
-inc() {
-  # This is rollforward without context checks for command line tweaking.
-  action="inc"
-  reset get_current_instance
-  reset get_new_instance
-}
-
-dec() {
-  # This is rollback without context checks for command line tweaking.
-  action="dec"
-  reset get_current_instance
-  reset get_new_instance
-}
-
-cur() {
-  # This will reset the action to use the current instance.
-  action="cur"
-  reset get_current_instance
-  reset get_new_instance
-}
-
 rollback() {
   action="rollback"
   dep get_current_instance
@@ -86,6 +64,34 @@ rollforward() {
   call live
 }
 
+#################################################################################
+# Action utilities.
+# inc, dec, and cur are utilities to set the new target instance. they do nothing
+# on their own, so should be followed with another command. 
+# Eg. "bash deploy.sh inc live" will symlink to the next instance without asking questions.
+inc() {
+  # This is rollforward without context checks for command line tweaking.
+  action="inc"
+  reset get_current_instance
+  reset get_new_instance
+}
+
+dec() {
+  # This is rollback without context checks for command line tweaking.
+  action="dec"
+  reset get_current_instance
+  reset get_new_instance
+}
+
+cur() {
+  # This will reset the action to use the current instance.
+  action="cur"
+  reset get_current_instance
+  reset get_new_instance
+}
+
+#################################################################################
+# Core functions
 build() {
   dep check_project_dir
   dep clear_new_instance_dir
@@ -100,15 +106,18 @@ build() {
 
 customise() {
   # Enable any extra modules or features.
-  call enable_modules
+  # call enable_modules
   # Some modules may have added new folders so set permissions again.
-  call set_permissions
+  # call set_permissions
   # Revert all features.
-  call revert
-  call set_theme
+  # call revert
+  # call set_theme
   dep add_settings
   call cache_clear
 }
+
+#################################################################################
+# Specific functions
 
 site_install() { 
   dep check_project_dir
@@ -118,6 +127,7 @@ site_install() {
   #run_cmd "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:""'""$MYSQL_PASS""'""@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir"
   drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir
 }
+
 
 make() {
   dep get_new_instance
