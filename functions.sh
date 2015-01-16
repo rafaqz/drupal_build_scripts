@@ -125,17 +125,13 @@ site_install() {
   dep link_files_dirs
   message "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
   #run_cmd "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:""'""$MYSQL_PASS""'""@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir"
-  drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir
+  # Pass a sendmail path to drush that will return true during the site install, so unsent emails don't break the build.
+  run_cmd "/usr/bin/env PHP_OPTIONS='-d sendmail_path=/usr/bin/true' drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir"
 }
-
 
 make() {
   dep get_new_instance
-  if cd $new_instance_dir; then
-    message "build dir allredy exists, drush make skipped."
-  else
     run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUTPUT $BUILD_TYPE"
-  fi
 }
 
 sync() {
@@ -199,8 +195,8 @@ clear_new_instance_dir() {
 
 get_current_instance() {
   # Get suffix number of current live database name, the first WORD after '--database=' in drush sql-connect output.
-  message "Getting instance from drush..."
-  current_instance_num=$(drush sql-connect --root=$LIVE_SYMLINK_DIR | awk -F"--database=" '{print $2}' | awk '{print $1}' | tr -dc '[0-9]')
+  # current_instance_num=$(drush sql-connect --root=$LIVE_SYMLINK_DIR | awk -F"--database=" '{print $2}' | awk '{print $1}' | tr -dc '[0-9]')
+  current_instance_num=$(cat $CURRENT_INSTANCE_FILE)
   current_instance_name=$PROJECT_NAME$current_instance_num
   current_instance_dir="$CODE_DIR/$current_instance_name"
   call check_current_instance_vars
@@ -267,6 +263,7 @@ live() {
   dep check_new_instance_dir
   # Create symlink to drupal dir for apache etc.
   run_cmd "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
+  run_cmd "echo $new_instance_num > $CURRENT_INSTANCE_FILE"
 }
 
 set_permissions() {

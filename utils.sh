@@ -38,7 +38,7 @@ call() {
 debug() {
   #if [ "$OUTPUT" == "$DEBUG" ] ; then
     # Print arguments and function parent in columns
-    printf "%-50s %s\n" ">>> $1: \"$2\""  "Called from: \"$3\""
+    printf "%-50s %s\n" "$depth $1: \"$2\""  "Called from: \"$3\""
   #fi
 }
 
