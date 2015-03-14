@@ -98,20 +98,11 @@ build() {
   dep make
   dep site_install
   call set_permissions
-  # Enable site theme before features are reverted.
-  call set_theme
   # Revert core features so all fields etc are available for dependencies without errors.
   call revert
 }
 
 customise() {
-  # Enable any extra modules or features.
-  # call enable_modules
-  # Some modules may have added new folders so set permissions again.
-  # call set_permissions
-  # Revert all features.
-  # call revert
-  # call set_theme
   dep add_settings
   call cache_clear
 }
@@ -235,13 +226,6 @@ get_new_instance() {
   new_instance_name=$PROJECT_NAME$new_instance_num
   new_instance_dir="$CODE_DIR/$new_instance_name"
   message "New instance: $new_instance_name"
-}
-
-set_theme() {
-  dep check_new_instance_dir
-  # Enable and set the theme
-  run_cmd "drush pm-enable $THEME --yes $OUTPUT --root=$new_instance_dir"
-  run_cmd "drush variable-set theme_default $THEME $OUTPUT --root=$new_instance_dir"
 }
 
 revert() {
