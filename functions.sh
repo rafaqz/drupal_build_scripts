@@ -29,13 +29,13 @@ update() {
   dep build_drush_aliases
   call build
   call customise
-  set_maintenence 1
+  set_maintenance 1
   call sync
   call repair_tables
   call sync_variables
   call cache_clear
   call live
-  set_maintenence 0
+  set_maintenance 0
 }
 
 rollback() {
@@ -422,6 +422,6 @@ check_user() {
   fi
 }
 
-set_maintenence() {
-  drush $current_alias drush variable-set --always-set maintenance_mode $1 $OUTPUT
+set_maintenance() {
+  drush $current_alias vset --always-set maintenance_mode $1 $OUTPUT
 }
