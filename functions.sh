@@ -126,7 +126,9 @@ site_install() {
   message "*** Installing drupal site $SITE_NAME to $new_instance_name database as mysql user $MYSQL_USER ***"
   #run_cmd "drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:""'""$MYSQL_PASS""'""@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir"
   # Pass a sendmail path to drush that will return true during the site install, so unsent emails don't break the build.
-  run_cmd "/usr/bin/env PHP_OPTIONS='-d sendmail_path=/usr/bin/true' drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir"
+  #TODO make this work for mandrill message_send
+  # run_cmd "/usr/bin/env PHP_OPTIONS='-d sendmail_path=/usr/bin/true' 
+  drush site-install $PROFILE --db-url=mysql://$MYSQL_USER:$MYSQL_PASS@127.0.0.1/$new_instance_name --account-pass=admin --site-name=$SITE_NAME --yes $OUTPUT --root=$new_instance_dir
 }
 
 make() {
@@ -262,6 +264,7 @@ enable_modules() {
 live() {
   dep check_new_instance_dir
   # Create symlink to drupal dir for apache etc.
+  run_cmd "sudo ln -snf $new_instance_dir $SHORTCUT_SYMLINK_DIR -v"
   run_cmd "sudo ln -snf $new_instance_dir $LIVE_SYMLINK_DIR -v"
   run_cmd "echo $new_instance_num > $CURRENT_INSTANCE_FILE"
 }

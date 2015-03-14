@@ -1,9 +1,22 @@
 #!/bin/bash
 
-# Get current directory and import config and shared functions files.
-SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
+# Set project directory structure. Can be overridden in config.sh
+CODE_DIR="$PROJECT_DIR/code/"
+PERMANENT_FILES_DIR="$PROJECT_DIR/permanent_files"
+FILES_DIR="$PERMANENT_FILES_DIR/files"
+PRIVATE_FILES_DIR="$PERMANENT_FILES_DIR/private"
+DRUPAL_FILES_DIR="sites/default/files"
+DRUPAL_PRIVATE_FILES_DIR="sites/default/private"
+DRUPAL_SETTINGS_PHP="sites/default/settings.php"
+CURRENT_INSTANCE_FILE="$PROJECT_DIR/instance"
+SHORTCUT_SYMLINK_DIR="$CODE_DIR/current"
+
+# Source custom config
 source "$SCRIPT_DIR/config.sh"
 source "$SCRIPT_DIR/functions.sh"
+
+# Get current directory and import config and shared functions files.
+SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 
 usage() { echo "Usage: $0 [-dp] [command1] [command2] ... [commandN]
   -y - yes to all confirmations
