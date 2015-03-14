@@ -133,7 +133,7 @@ site_install() {
 
 make() {
   dep get_new_instance
-    run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUTPUT $BUILD_TYPE"
+  run_cmd "drush make $MAKE_FILE $new_instance_dir --yes --no-gitinfofile $OUTPUT $BUILD_TYPE"
 }
 
 sync() {
@@ -177,16 +177,17 @@ repair_tables() {
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
   Set ft1.fid = f1.fid;
 
-  UPDATE ${new_instance_name}.flag_counts fc1 
-  INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc1.fid 
-  INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
-  Set fc1.fid = f1.fid;
-
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.module = \"book\"; 
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.menu_name = \"main-menu\" AND ml2.module = \"menu\"; 
 
   UPDATE ${new_instance_name}.menu_links ml Set ml.hidden=1, ml.customized=1 WHERE ml.link_title IN (\"Log out\", \"User account\"); 
-  " 
+
+  UPDATE ${new_instance_name}.flag_counts fc1 
+  INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc1.fid 
+  INNER JOIN ${new_instance_name}.flag f1 ON f2.name = f1.name 
+  Set fc1.fid = f1.fid;
+
+  " || { die; }
 }
 
 clear_new_instance_dir() {
@@ -421,6 +422,6 @@ check_user() {
   fi
 }
 
-set_maintence() {
+set_maintenence() {
   drush $current_alias drush variable-set --always-set maintenance_mode $1 $OUTPUT
 }

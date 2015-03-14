@@ -37,7 +37,7 @@ done
 for var in "$@"
 do
   debug "Run" $var "shell" 
-  eval $var
+  eval $var || { die;}
   debug "Success" $var "shell" 
 done
 
