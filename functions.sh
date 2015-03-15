@@ -168,10 +168,11 @@ repair_tables() {
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
   Set ft1.fid = f1.fid;
 
-  UPDATE ${new_instance_name}.flag_counts fc1 
-  INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc1.fid 
-  INNER JOIN ${new_instance_name}.flag f1 ON f2.name = f1.name 
-  Set fc1.fid = f1.fid;
+  INSERT INTO ${new_instance_name}.flag_counts 
+  SELECT fc2.entity_type, fc2.entity_id, fc2.count, fc2.last_updated, f1.fid 
+  FROM ${current_instance_name}.flag_counts fc2 
+  INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc2.fid 
+  INNER JOIN ${new_instance_name}.flag f1 ON f2.name = f1.name;
 
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.module = \"book\"; 
   INSERT INTO ${new_instance_name}.menu_links SELECT * FROM ${current_instance_name}.menu_links ml2 WHERE ml2.menu_name = \"main-menu\" AND ml2.module = \"menu\"; 
