@@ -168,7 +168,7 @@ repair_tables() {
   INNER JOIN ${new_instance_name}.flag f1 ON f1.name = f2.name 
   Set ft1.fid = f1.fid;
 
-  INSERT INTO ${new_instance_name}.flag_counts
+  INSERT IGNORE INTO ${new_instance_name}.flag_counts
   SELECT fc2.entity_type, fc2.entity_id, fc2.count, fc2.last_updated, f1.fid 
   FROM ${current_instance_name}.flag_counts fc2 
   INNER JOIN ${current_instance_name}.flag f2 ON f2.fid = fc2.fid 
