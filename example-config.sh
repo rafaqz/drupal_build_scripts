@@ -26,8 +26,7 @@ SITE_NAME=''
 PROFILE=''
 # Make file location. Only change this if you know what you are doing.
 MAKE_FILE=''
-# Set the theme (should possibly remove this)
-THEME='' 
+ENVIRONMENT="development" # development staging production
 
 # For drush aliases.
 DRUSH_ALIAS_DIR="/home/raf/.drush"
@@ -40,14 +39,11 @@ STAGE_URI=''
 STAGE_REMOTE_HOST=''
 STAGE_REMOTE_USER=''
 
-
-# URL of list of modules enabled file, containing module names separated by spaces and/or commas.
-MODULE_ENABLED_LIST=''
 # URL of list of skip tables file, containing table names separated by spaces and/or commas.
 SKIP_TABLES_LIST=''
 # URL of list of sync variables file, containing variable names, one per line.
 VARIABLE_LIST=''
 # URL of file containing extra lines for settings.php.
-EXTRA_SETTINGS=''
+SHARED_SETTINGS=""
+ENVIRONMENT_SETTINGS="settings_url${ENVIRONMENT}.your_extension"
 
-ENVIRONMENT="development" # development staging production

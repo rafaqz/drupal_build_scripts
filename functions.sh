@@ -145,7 +145,8 @@ sync_variables() {
 
 add_settings() {
   dep get_new_instance
-  run_cmd "wget -qO- $EXTRA_SETTINGS >> $new_instance_dir/sites/default/settings.php"
+  run_cmd "wget -qO- $SHARED_SETTINGS >> $new_instance_dir/sites/default/settings.php"
+  run_cmd "wget -qO- $ENVIRONMENT_SETTINGS >> $new_instance_dir/sites/default/settings.php"
 }
 
 repair_tables() {
