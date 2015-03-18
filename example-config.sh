@@ -50,14 +50,4 @@ VARIABLE_LIST=''
 # URL of file containing extra lines for settings.php.
 EXTRA_SETTINGS=''
 
-# Build site with development repositories or just production files.
-DEV='--working-copy'
-STAGE=''
-# $DEV or $STAGE
-BUILD_TYPE=$DEV
-
-# Debugging output.
-DEBUG='--debug -v'
-CLEAN=''
-# $DEBUG or $CLEAN
-OUTPUT=$DEBUG
+ENVIRONMENT="development" # development staging production

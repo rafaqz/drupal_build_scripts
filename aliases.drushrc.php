@@ -37,11 +37,6 @@ for ($i = 1; $i <= $aliases['local']['project_instances']; $i++) {
   $aliases[$alias] = array(
     'parent' => '@{{project_name}}.local',
     'root' => "{$aliases['local']['project_code_dir']}/$instance",
-    'command-specific' => array (
-      'sql-sync' => array (
-         'skip-tables-list' => '{{skip_tables}}'
-       ),
-     ),
   );
 }
 
